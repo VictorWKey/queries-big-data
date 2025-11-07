@@ -6,7 +6,7 @@ import org.apache.spark.sql.DataFrame
 // IMDBQueriesCompact.main(Array())
 
 object IMDBQueriesCompact {
-  
+   
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder()
       .appName("IMDB Movies Analysis - Compact")
@@ -32,7 +32,7 @@ object IMDBQueriesCompact {
     
     val fullDF = moviesDF.join(ratingsDF, Seq("imdb_title_id"), "left")
     
-  println("Sistema de Consultas - Películas")
+    println("Sistema de Consultas - Películas")
     
     ejecutarConsultasCompactas(spark, fullDF)
     
