@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Script de instalación de Apache Spark para WSL
+# Script de instalacion de Apache Spark para WSL
 
-echo "=== Configurando Apache Spark ==="
+echo "Configurando Apache Spark"
 
 # Verificar si Spark ya está instalado
 if [ -d "/opt/spark" ]; then
-    echo "✓ Spark ya está instalado en /opt/spark"
+    echo "Spark ya esta instalado en /opt/spark"
 else
     echo "Descargando Apache Spark 3.3.1..."
     
@@ -24,11 +24,11 @@ else
         echo "Descargando desde: $SPARK_URL"
         wget -q --show-progress "$SPARK_URL"
         if [ $? -ne 0 ]; then
-            echo "✗ Error al descargar Spark. Verifica tu conexión a internet."
+            echo "Error al descargar Spark. Verifica tu conexion a internet."
             exit 1
         fi
     else
-        echo "✓ Archivo $SPARK_TGZ ya existe"
+        echo "Archivo $SPARK_TGZ ya existe"
     fi
     
     # Extraer el archivo
@@ -36,7 +36,7 @@ else
         echo "Extrayendo Spark..."
         tar -xzf "$SPARK_TGZ"
         if [ $? -ne 0 ]; then
-            echo "✗ Error al extraer Spark"
+            echo "Error al extraer Spark"
             exit 1
         fi
     fi
@@ -48,7 +48,7 @@ else
     # Limpiar archivo descargado
     rm -f "$SPARK_TGZ"
     
-    echo "✓ Spark instalado en /opt/spark"
+    echo "Spark instalado en /opt/spark"
 fi
 
 # Configurar variables de entorno
@@ -61,9 +61,9 @@ if ! grep -q "SPARK_HOME" "$SPARK_ENV_FILE"; then
     echo "export SPARK_HOME=/opt/spark" >> "$SPARK_ENV_FILE"
     echo "export PATH=\$PATH:\$SPARK_HOME/bin:\$SPARK_HOME/sbin" >> "$SPARK_ENV_FILE"
     echo "export PYSPARK_PYTHON=python3" >> "$SPARK_ENV_FILE"
-    echo "✓ Variables de entorno agregadas a ~/.zshrc"
+    echo "Variables de entorno agregadas a ~/.zshrc"
 else
-    echo "✓ Variables de entorno ya configuradas"
+    echo "Variables de entorno ya configuradas"
 fi
 
 # Aplicar las variables de entorno en la sesión actual
@@ -71,6 +71,6 @@ export SPARK_HOME=/opt/spark
 export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
 
 echo ""
-echo "=== Instalación completada ==="
-echo "Por favor ejecuta: source ~/.zshrc"
+echo "Instalacion completada"
+echo "Ejecuta: source ~/.zshrc"
 echo "Luego verifica con: spark-shell --version"
