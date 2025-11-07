@@ -4,12 +4,51 @@
 
 echo "=== Configurando Apache Spark ==="
 
-# Mover Spark a una ubicación estándar
-if [ ! -d "/opt/spark" ]; then
-    sudo mv ~/spark-3.3.1-bin-hadoop3 /opt/spark
-    echo "✓ Spark movido a /opt/spark"
+# Verificar si Spark ya está instalado
+if [ -d "/opt/spark" ]; then
+    echo "✓ Spark ya está instalado en /opt/spark"
 else
-    echo "✓ Spark ya está en /opt/spark"
+    echo "Descargando Apache Spark 3.3.1..."
+    
+    # Descargar Spark si no existe
+    SPARK_VERSION="3.3.1"
+    HADOOP_VERSION="3"
+    SPARK_DIR="spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}"
+    SPARK_TGZ="${SPARK_DIR}.tgz"
+    SPARK_URL="https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/${SPARK_TGZ}"
+    
+    cd ~
+    
+    # Descargar si no existe el archivo
+    if [ ! -f "$SPARK_TGZ" ]; then
+        echo "Descargando desde: $SPARK_URL"
+        wget -q --show-progress "$SPARK_URL"
+        if [ $? -ne 0 ]; then
+            echo "✗ Error al descargar Spark. Verifica tu conexión a internet."
+            exit 1
+        fi
+    else
+        echo "✓ Archivo $SPARK_TGZ ya existe"
+    fi
+    
+    # Extraer el archivo
+    if [ ! -d "$SPARK_DIR" ]; then
+        echo "Extrayendo Spark..."
+        tar -xzf "$SPARK_TGZ"
+        if [ $? -ne 0 ]; then
+            echo "✗ Error al extraer Spark"
+            exit 1
+        fi
+    fi
+    
+    # Mover a /opt/spark
+    echo "Instalando Spark en /opt/spark..."
+    sudo mv "$SPARK_DIR" /opt/spark
+    
+    # Limpiar archivo descargado
+    rm -f "$SPARK_TGZ"
+    
+    echo "✓ Spark instalado en /opt/spark"
 fi
 
 # Configurar variables de entorno
