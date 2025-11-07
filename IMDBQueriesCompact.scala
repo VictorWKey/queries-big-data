@@ -8,7 +8,7 @@ object IMDBQueriesCompact {
     val spark = SparkSession.builder()
       .appName("IMDB Movies Analysis - Compact")
       .master("local[*]")
-      .config("spark.driver.memory", "4g")
+      .config("spark.driver.memory", "6g")
       .getOrCreate()
     
     spark.sparkContext.setLogLevel("ERROR")
@@ -29,9 +29,7 @@ object IMDBQueriesCompact {
     
     val fullDF = moviesDF.join(ratingsDF, Seq("imdb_title_id"), "left")
     
-    println("\n" + "="*100)
-    println(" "*35 + "SISTEMA DE CONSULTAS IMDB")
-    println("="*100 + "\n")
+    println("Sistema de Consultas IMDB")
     
     ejecutarConsultasCompactas(spark, fullDF)
     
@@ -114,25 +112,21 @@ object IMDBQueriesCompact {
       .orderBy(col("avg_vote").desc)
     })
     
-    println("\n" + "="*100)
-    println(" "*40 + "✓ TODAS LAS CONSULTAS COMPLETADAS")
-    println("="*100 + "\n")
+    println("Todas las consultas completadas")
   }
   
   def mostrarResultado(numero: String, titulo: String, resultado: => DataFrame): Unit = {
-    println("\n┌" + "─"*98 + "┐")
-    println(s"│ CONSULTA $numero: $titulo" + " "*(96 - titulo.length - numero.length - 12) + "│")
-    println("└" + "─"*98 + "┘")
+    println(s"\nConsulta $numero: $titulo")
     
     val df = resultado
     val total = df.count()
     
     if (total > 0) {
-      println(s"\n📊 Total encontradas: $total películas")
-      println("\n🎬 Top 10 resultados:\n")
+      println(s"Total encontradas: $total películas")
+      println("Top 10 resultados:")
       df.show(10, truncate = 40)
     } else {
-      println("\n⚠️  No se encontraron resultados para esta consulta.\n")
+      println("No se encontraron resultados para esta consulta.")
     }
   }
 }
