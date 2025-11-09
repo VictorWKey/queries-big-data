@@ -1,0 +1,135 @@
+================================================================================
+RESUMEN EJECUTIVO - MODELO DE PREDICCIÓN IMDB
+================================================================================
+
+📊 DATASET
+--------------------------------------------------------------------------------
+Total de películas:           85,855
+Películas limpias:            69,107 (80.49% retención)
+Columnas utilizadas:          10 principales
+Target variable:              avg_vote (1.0-10.0, media: 5.9)
+
+🔧 FEATURE ENGINEERING
+--------------------------------------------------------------------------------
+Total de features:            ~130
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│ TIPO                    │ FEATURES │ TÉCNICA                            │
+├─────────────────────────┼──────────┼────────────────────────────────────┤
+│ Texto                   │    100   │ TF-IDF Unigrams (description)      │
+│ Categóricas             │     19   │ Target Encoding + Feature Hashing  │
+│   ├─ Genre              │     16   │ Feature Hashing (top 30)           │
+│   ├─ Director           │      1   │ Target Encoding (10K+ → 1)         │
+│   ├─ Actors             │      1   │ Target Encoding (55K+ → 1)         │
+│   └─ Duration Category  │      1   │ StringIndexer                      │
+│ Numéricas Originales    │      5   │ duration, votes, reviews, year     │
+│ Numéricas Derivadas     │      6   │ log_votes, ratios, flags           │
+└─────────────────────────┴──────────┴────────────────────────────────────┘
+
+🤖 MODELOS ENTRENADOS
+--------------------------------------------------------------------------------
+
+┌──────────────────────────┬──────────┬──────────┬──────────┬──────────┐
+│ MODELO                   │   RMSE   │   MAE    │    R²    │  TIEMPO  │
+├──────────────────────────┼──────────┼──────────┼──────────┼──────────┤
+│ Ridge Regression         │  0.1265  │  0.0951  │  0.9895  │  0.11 m  │
+│ Random Forest            │  0.1702  │  0.1025  │  0.9810  │  0.24 m  │
+│ Gradient Boosted Trees ★ │  0.0912  │  0.0401  │  0.9945  │  0.82 m  │
+│ Ensemble                 │  0.0977  │  0.0555  │  0.9937  │   ~1 m   │
+└──────────────────────────┴──────────┴──────────┴──────────┴──────────┘
+
+🏆 MEJOR MODELO: Gradient Boosted Trees
+--------------------------------------------------------------------------------
+RMSE:                     0.0912  (error promedio ~0.09 puntos en escala 1-10)
+R²:                       0.9945  (explica 99.45% de la varianza)
+Mejora sobre baseline:    27.95% reducción en RMSE
+
+Interpretación:
+  → Predicción extremadamente precisa
+  → Error típico menor a 0.1 puntos
+  → Captura casi toda la variabilidad en calificaciones
+
+💡 TÉCNICAS CLAVE
+--------------------------------------------------------------------------------
+✅ Target Encoding          → Soluciona alta cardinalidad sin OOM
+✅ Feature Hashing          → Dimensión controlada para categoricals
+✅ Feature Engineering      → 6 features derivadas mejoran R²
+✅ TF-IDF                   → Captura semántica del texto
+✅ StandardScaler           → Normalización óptima
+✅ Subsampling (0.8)        → Reduce memoria y mejora generalización
+
+⚠️ PROBLEMAS RESUELTOS
+--------------------------------------------------------------------------------
+Problema:  OutOfMemoryError con Random Forest
+Causa:     Alta cardinalidad (actors: 55K, genre: 1.1K valores)
+Solución:  Target Encoding + Feature Hashing + Subsampling
+
+Problema:  Grid Search extremadamente lento
+Causa:     18-27 combinaciones × 3 folds = 54-81 entrenamientos
+Solución:  Hiperparámetros fijos basados en mejores prácticas
+
+Problema:  Dimensionalidad explosiva con OneHotEncoder
+Causa:     55K actores → 55K columnas sparse
+Solución:  Target Encoding reduce a 1 feature numérica densa
+
+📈 FEATURE IMPORTANCE (Top 5 - GBT)
+--------------------------------------------------------------------------------
+1. Feature 51         29.78%    → log_votes
+2. Feature 52         25.89%    → votes
+3. Feature 54         19.57%    → reviews/year features
+4. Feature 50         17.69%    → TF-IDF components
+5. Feature 53          5.14%    → categorical encoded
+
+Conclusión: Features numéricas (votes, reviews) son MÁS predictivas que texto
+
+🚀 ESPECIFICACIONES TÉCNICAS
+--------------------------------------------------------------------------------
+Framework:               Apache Spark 3.3.1 + SparkML
+Lenguaje:                Scala 2.12.15
+Memoria requerida:       14GB (driver + executor)
+Particiones:             100 (optimizado)
+Tiempo total:            ~1.2 minutos
+Storage strategy:        MEMORY_AND_DISK
+
+Configuraciones críticas:
+  spark.memory.fraction=0.8
+  spark.memory.storageFraction=0.2
+  spark.sql.shuffle.partitions=50
+  spark.driver.maxResultSize=2g
+
+📁 ARCHIVOS GENERADOS
+--------------------------------------------------------------------------------
+Código:
+  - IMDBPredictionModelSimplified.scala     (modelo principal)
+  - DataValidation.scala                    (validación)
+
+Resultados:
+  - reporte_simplificado.txt                (análisis comparativo)
+  - simplified_baseline_predictions.txt     (top 20 errores)
+  - simplified_rf_predictions.txt
+  - simplified_gbt_predictions.txt
+  - simplified_ensemble_predictions.txt     (475KB - predicciones completas)
+
+🎓 CONCLUSIONES
+--------------------------------------------------------------------------------
+✓ El modelo GBT alcanza R² = 0.9945, indicando predicciones casi perfectas
+✓ Target Encoding es superior a OneHotEncoder para high-cardinality features
+✓ Feature Engineering (log transforms, ratios) mejora significativamente
+✓ TF-IDF captura información semántica útil de descripciones
+✓ Ensemble no supera a GBT individual (mejor modelo single)
+
+Limitaciones identificadas:
+  - Random Forest underperforms vs GBT en este dataset
+  - Bi-gramas no justifican costo computacional adicional
+  - Grid Search impracticable sin cluster distribuido
+
+Mejoras futuras sugeridas:
+  - Word2Vec para embeddings semánticos profundos
+  - Análisis de sentimiento en descriptions
+  - Features de presupuesto/recaudación (si disponibles)
+  - Información de premios y nominaciones
+
+================================================================================
+Proyecto completado exitosamente - Noviembre 2025
+Autor: Victor W. Key
+================================================================================

@@ -989,3 +989,11 @@ java.nio.file.FileSystemNotFoundException: Provider "vscode-chat-code-block" not
 	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
 	at java.base/java.lang.Thread.run(Thread.java:840)
 
+2025.11.09 11:00:34 WARN  No build server connected[0m
+2025.11.09 11:00:34 INFO  compiling queries-big-data_d5c0a6989e (5 scala sources)[0m
+2025.11.09 11:00:34 WARN  Invalid text document uri received from build server: file:///home/victorwkey/queries-big-data/ml_prediction/IMDBPredictionModel.scala[0m
+2025.11.09 11:00:34 WARN  Invalid text document uri received from build server: file:///home/victorwkey/queries-big-data/ml_prediction/IMDBPredictionModelOptimized.scala[0m
+2025.11.09 11:00:34 WARN  Invalid text document uri received from build server: file:///home/victorwkey/queries-big-data/ml_prediction/IMDBPredictionModelAdvanced.scala[0m
+2025.11.09 11:00:34 INFO  time: compiled queries-big-data_d5c0a6989e in 0.55s[0m
+2025.11.09 11:00:34 INFO  compiling queries-big-data_d5c0a6989e (5 scala sources)[0m
+2025.11.09 11:00:35 INFO  time: compiled queries-big-data_d5c0a6989e in 0.5s[0m
