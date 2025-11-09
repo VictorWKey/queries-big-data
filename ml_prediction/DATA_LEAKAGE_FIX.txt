@@ -1,0 +1,83 @@
+================================================================================
+⚠️  CORRECCIÓN CRÍTICA - DATA LEAKAGE DETECTADO Y CORREGIDO
+================================================================================
+
+PROBLEMA IDENTIFICADO:
+--------------------------------------------------------------------------------
+Las métricas originales (R² = 0.9945) eran INCORRECTAS debido a DATA LEAKAGE.
+
+El Target Encoding se aplicaba a TODO el dataset ANTES del split train/test:
+  
+  ❌ INCORRECTO (versión anterior):
+     1. Calcular avg_vote promedio por director/actor en TODOS los datos
+     2. Aplicar encoding a todos los datos
+     3. Split train/test
+     4. Entrenar modelo
+     
+  → El modelo "veía" información del test set durante feature engineering
+  → Métricas artificialmente infladas
+
+CORRECCIÓN APLICADA:
+--------------------------------------------------------------------------------
+  ✅ CORRECTO (versión corregida):
+     1. Split train/test en datos RAW
+     2. Calcular avg_vote promedio por director/actor SOLO en train
+     3. Aplicar encoding a train
+     4. Aplicar MISMO encoding a test (usando mapeo de train)
+     5. Entrenar modelo
+     
+  → El modelo NUNCA ve información del test set
+  → Métricas realistas y honestas
+
+CAMBIOS EN EL CÓDIGO:
+--------------------------------------------------------------------------------
+- Función aplicarFeatureEngineering() → ELIMINADA
+- Nueva función aplicarFeatureEngineeringConSplit() → Procesa train y test separadamente
+- targetEncode() → Reemplazado por targetEncodeOnTrain() + applyTargetEncoding()
+- reduceCardinality() → Reemplazado por reduceCardinalityOnTrain() + applyCardinalityReduction()
+
+FLUJO CORRECTO:
+--------------------------------------------------------------------------------
+1. Cargar datos
+2. Limpiar datos (remove nulls, parse year)
+3. ✅ SPLIT TRAIN/TEST (80/20)  ← CRÍTICO: ANTES de feature engineering
+4. Target Encoding en train → guardar mapa
+5. Aplicar mapa a test
+6. Reducir cardinalidad en train → guardar categorías top
+7. Aplicar categorías a test  
+8. Crear features derivadas (sin leakage)
+9. Entrenar modelos
+10. Evaluar en test
+
+PRÓXIMOS PASOS:
+--------------------------------------------------------------------------------
+Re-ejecutar el modelo corregido para obtener métricas REALES.
+
+Expectativas realistas:
+  - R² esperado: 0.25 - 0.40 (vs 0.9945 con leakage)
+  - RMSE esperado: 0.95 - 1.15 (vs 0.0912 con leakage)
+  
+Si R² > 0.35, seguirá siendo un modelo EXCELENTE.
+Si R² > 0.30, es un modelo BUENO.
+Si R² < 0.25, necesitamos más features o revisar el approach.
+
+================================================================================
+LECCIÓN APRENDIDA
+================================================================================
+Siempre hacer split ANTES de cualquier transformación que use estadísticas
+globales o agregaciones del target variable.
+
+Transformaciones seguras (se pueden hacer antes del split):
+  ✅ Normalización de strings
+  ✅ Parsing de fechas
+  ✅ Creación de features basadas en la misma fila (ratios, log transforms)
+  ✅ Tokenización de texto
+
+Transformaciones peligrosas (DEBEN hacerse después del split):
+  ❌ Target Encoding (usa mean/median del target)
+  ❌ Frequency Encoding (usa conteos globales con target)
+  ❌ Leave-One-Out Encoding
+  ❌ Weight of Evidence
+  ❌ Cualquier cosa que use estadísticas del target variable
+
+================================================================================

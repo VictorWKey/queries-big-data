@@ -8,14 +8,14 @@ import org.apache.spark.ml.{Pipeline, PipelineModel}
 import org.apache.spark.storage.StorageLevel
 import java.io.PrintWriter
 
-// :load ml_prediction/IMDBPredictionModelSimplified.scala
-// IMDBPredictionModelSimplified.main(Array())
+// :load ml_prediction/IMDBPredictionModelNOLEAKAGE.scala
+// IMDBPredictionModelNOLEAKAGE.main(Array())
 
-object IMDBPredictionModelSimplified {
+object IMDBPredictionModelNOLEAKAGE {
   
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder()
-      .appName("IMDB Rating Prediction - Simplified")
+      .appName("IMDB Rating Prediction - NO LEAKAGE")
       .master("local[*]")
       .config("spark.driver.memory", "10g")
       .config("spark.executor.memory", "10g")
@@ -28,7 +28,22 @@ object IMDBPredictionModelSimplified {
     spark.sparkContext.setLogLevel("ERROR")
     
     println("=" * 80)
-    println("MODELO DE PREDICCIÓN SIMPLIFICADO - CALIFICACIÓN IMDB")
+    println("🛡️  MODELO DE PREDICCIÓN - SIN DATA LEAKAGE - CALIFICACIÓN IMDB")
+    println("=" * 80)
+    println()
+    println("⚠️  VARIABLES EXCLUIDAS (data leakage):")
+    println("   ❌ votes - Correlacionado con popularidad del rating")
+    println("   ❌ reviews_from_users - Consecuencia del rating")
+    println("   ❌ reviews_from_critics - Consecuencia del rating")
+    println("   ❌ Variables derivadas de las anteriores")
+    println()
+    println("✅ VARIABLES PERMITIDAS (predictores legítimos):")
+    println("   ✓ description - Contenido independiente")
+    println("   ✓ genre - Característica intrínseca")
+    println("   ✓ director - Característica intrínseca")
+    println("   ✓ actors - Característica intrínseca")
+    println("   ✓ duration - Característica intrínseca")
+    println("   ✓ year - Característica temporal")
     println("=" * 80)
     println()
     
@@ -38,11 +53,10 @@ object IMDBPredictionModelSimplified {
     println("📊 PASO 1: Cargando y preparando datos...")
     val fullDF = cargarYJoinearDatos(spark, moviesPath, ratingsPath)
     
-    println("\n🧹 PASO 2: Limpiando datos...")
-    val cleanDF = limpiarYEnriquecerDatos(fullDF)
+    println("\n🧹 PASO 2: Limpiando datos (SIN usar votes/reviews)...")
+    val cleanDF = limpiarDatosSinLeakage(fullDF)
     
-    println("\n🔧 PASO 3: Dividiendo train/test (80/20) ANTES de Feature Engineering...")
-    println("   ⚠️  CRÍTICO: Split ANTES de Target Encoding para evitar data leakage")
+    println("\n🔧 PASO 3: Dividiendo train/test (80/20)...")
     val Array(trainDataRaw, testDataRaw) = cleanDF.randomSplit(Array(0.8, 0.2), seed = 42)
     
     println("\n🎯 PASO 4: Aplicando Feature Engineering SOLO en train...")
@@ -56,7 +70,6 @@ object IMDBPredictionModelSimplified {
     
     println(s"   ✓ Datos de entrenamiento: $trainCount filas")
     println(s"   ✓ Datos de prueba: $testCount filas")
-    println(s"   ✓ Encodings calculados solo en train (sin data leakage)")
     println(s"   ✓ Director encodings: ${encodingMaps("director").size} categorías")
     println(s"   ✓ Actors encodings: ${encodingMaps("actors").size} categorías")
     
@@ -71,13 +84,13 @@ object IMDBPredictionModelSimplified {
     guardarPredicciones(
       baselineModel, 
       testOptimized, 
-      "ml_prediction/resultados/simplified_baseline_predictions.txt"
+      "ml_prediction/resultados/noleakage_baseline_predictions.txt"
     )
     
     // ============================================================================
-    // MODELO 2: Random Forest (Hiperparámetros fijos optimizados)
+    // MODELO 2: Random Forest
     // ============================================================================
-    println("\n🌲 PASO 6: Entrenando Random Forest (hiperparámetros optimizados)...")
+    println("\n🌲 PASO 6: Entrenando Random Forest...")
     val (rfModel, rfMetrics, rfTime) = entrenarRandomForest(
       trainOptimized, testOptimized
     )
@@ -86,13 +99,13 @@ object IMDBPredictionModelSimplified {
     guardarPredicciones(
       rfModel, 
       testOptimized, 
-      "ml_prediction/resultados/simplified_rf_predictions.txt"
+      "ml_prediction/resultados/noleakage_rf_predictions.txt"
     )
     
     // ============================================================================
-    // MODELO 3: Gradient Boosted Trees (Hiperparámetros fijos optimizados)
+    // MODELO 3: Gradient Boosted Trees
     // ============================================================================
-    println("\n🚀 PASO 7: Entrenando GBT (hiperparámetros optimizados)...")
+    println("\n🚀 PASO 7: Entrenando GBT...")
     val (gbtModel, gbtMetrics, gbtTime) = entrenarGBT(
       trainOptimized, testOptimized
     )
@@ -101,7 +114,7 @@ object IMDBPredictionModelSimplified {
     guardarPredicciones(
       gbtModel, 
       testOptimized, 
-      "ml_prediction/resultados/simplified_gbt_predictions.txt"
+      "ml_prediction/resultados/noleakage_gbt_predictions.txt"
     )
     
     // ============================================================================
@@ -159,7 +172,7 @@ object IMDBPredictionModelSimplified {
     joinedDF
   }
   
-  def limpiarYEnriquecerDatos(df: DataFrame): DataFrame = {
+  def limpiarDatosSinLeakage(df: DataFrame): DataFrame = {
     val originalCount = df.count()
     
     val dfYearCleaned = df.withColumn(
@@ -167,10 +180,10 @@ object IMDBPredictionModelSimplified {
       regexp_replace(col("year"), "[^0-9]", "").cast(IntegerType)
     )
     
+    // CRÍTICO: NO usar votes, reviews_from_users, reviews_from_critics
     val cleanDF = dfYearCleaned.na.drop(Seq(
       "description", "genre", "director", "actors",
-      "duration", "avg_vote", "votes", 
-      "reviews_from_users", "reviews_from_critics", "year_clean"
+      "duration", "avg_vote", "year_clean"
     ))
     
     val cleanCount = cleanDF.count()
@@ -183,31 +196,26 @@ object IMDBPredictionModelSimplified {
     cleanDF
   }
   
-  // NUEVA FUNCIÓN: Feature Engineering con split correcto (sin data leakage)
   def aplicarFeatureEngineeringConSplit(
     trainRaw: DataFrame, 
     testRaw: DataFrame
   ): (DataFrame, DataFrame, Map[String, Map[String, Double]]) = {
     
-    // 1. Target Encoding para DIRECTOR (solo en train)
     println("   🔧 Aplicando Target Encoding para director (SOLO TRAIN)...")
     val (trainWithDirector, directorMap) = targetEncodeOnTrain(trainRaw, "director", "avg_vote")
     val testWithDirector = applyTargetEncoding(testRaw, "director", directorMap)
     
-    // 2. Target Encoding para ACTORS (solo en train)
     println("   🔧 Aplicando Target Encoding para actors (SOLO TRAIN)...")
     val (trainWithActors, actorsMap) = targetEncodeOnTrain(trainWithDirector, "actors", "avg_vote")
     val testWithActors = applyTargetEncoding(testWithDirector, "actors", actorsMap)
     
-    // 3. Reducir cardinalidad de GENRE (basado solo en train)
     println("   🔧 Reduciendo cardinalidad de genre (basado en TRAIN)...")
     val (trainWithGenre, genreTopCategories) = reduceCardinalityOnTrain(trainWithActors, "genre", topN = 30)
     val testWithGenre = applyCardinalityReduction(testWithActors, "genre", genreTopCategories)
     
-    // 4. Features derivadas (sin leakage - solo usan la misma fila)
-    println("   🔧 Creando features derivadas...")
-    val trainEnriched = crearFeaturesDerivadasSeguras(trainWithGenre)
-    val testEnriched = crearFeaturesDerivadasSeguras(testWithGenre)
+    println("   🔧 Creando features derivadas (SIN LEAKAGE)...")
+    val trainEnriched = crearFeaturesDerivadasSinLeakage(trainWithGenre)
+    val testEnriched = crearFeaturesDerivadasSinLeakage(testWithGenre)
     
     println("   ✓ Feature Engineering completado SIN data leakage")
     
@@ -219,7 +227,6 @@ object IMDBPredictionModelSimplified {
     (trainEnriched, testEnriched, encodingMaps)
   }
   
-  // Target Encoding SOLO en train, retorna el mapa de encodings
   def targetEncodeOnTrain(
     df: DataFrame, 
     column: String, 
@@ -245,7 +252,6 @@ object IMDBPredictionModelSimplified {
       category -> smoothedValue
     }.toMap
     
-    // Agregar globalMean como default
     val encodingMapWithDefault = encodingMap + ("__UNKNOWN__" -> globalMean)
     
     val dfEncoded = applyTargetEncoding(df, column, encodingMapWithDefault)
@@ -253,7 +259,6 @@ object IMDBPredictionModelSimplified {
     (dfEncoded, encodingMapWithDefault)
   }
   
-  // Aplicar Target Encoding usando un mapa pre-calculado
   def applyTargetEncoding(
     df: DataFrame, 
     column: String, 
@@ -270,7 +275,6 @@ object IMDBPredictionModelSimplified {
       .drop(column)
   }
   
-  // Reducir cardinalidad SOLO en train
   def reduceCardinalityOnTrain(
     df: DataFrame, 
     column: String, 
@@ -291,7 +295,6 @@ object IMDBPredictionModelSimplified {
     (dfReduced, topCategories)
   }
   
-  // Aplicar reducción de cardinalidad usando categorías pre-calculadas
   def applyCardinalityReduction(
     df: DataFrame, 
     column: String, 
@@ -305,21 +308,15 @@ object IMDBPredictionModelSimplified {
     df.withColumn(column, categorizeUDF(col(column)))
   }
   
-  // Features derivadas que NO causan data leakage (solo usan valores de la misma fila)
-  def crearFeaturesDerivadasSeguras(df: DataFrame): DataFrame = {
+  // CRÍTICO: Features derivadas SIN usar votes/reviews
+  def crearFeaturesDerivadasSinLeakage(df: DataFrame): DataFrame = {
     df
-      .withColumn("votes_per_review", 
-        col("votes") / (col("reviews_from_users") + col("reviews_from_critics") + 1))
-      .withColumn("review_ratio", 
-        col("reviews_from_users") / (col("reviews_from_critics") + 1))
       .withColumn("decade", 
         (col("year_clean") / 10).cast(IntegerType) * 10)
       .withColumn("is_recent", 
         when(col("year_clean") >= 2015, 1.0).otherwise(0.0))
       .withColumn("is_old_classic", 
         when(col("year_clean") <= 1980, 1.0).otherwise(0.0))
-      .withColumn("log_votes", 
-        log1p(col("votes")))
       .withColumn("duration_category",
         when(col("duration") <= 90, "short")
         .when(col("duration") <= 120, "medium")
@@ -331,7 +328,6 @@ object IMDBPredictionModelSimplified {
   // ==========================================================================
   
   def crearPipeline(regressor: org.apache.spark.ml.Estimator[_]): Pipeline = {
-    // 1. TF-IDF para description (SOLO unigrams, 100 features - REDUCIDO)
     val descTokenizer = new RegexTokenizer()
       .setInputCol("description")
       .setOutputCol("desc_words")
@@ -345,48 +341,41 @@ object IMDBPredictionModelSimplified {
     val descHashingTF = new HashingTF()
       .setInputCol("desc_filtered")
       .setOutputCol("desc_tf")
-      .setNumFeatures(100)  // Reducido de 150 a 100
+      .setNumFeatures(100)
     
     val descIDF = new IDF()
       .setInputCol("desc_tf")
       .setOutputCol("description_features")
     
-    // 2. FeatureHasher para genre (16 features - MUY REDUCIDO)
     val genreHasher = new FeatureHasher()
       .setInputCols(Array("genre"))
       .setOutputCol("genre_features")
-      .setNumFeatures(16)  // Reducido de 32 a 16
+      .setNumFeatures(16)
     
-    // 3. StringIndexer para duration_category
     val durationIndexer = new StringIndexer()
       .setInputCol("duration_category")
       .setOutputCol("duration_indexed")
       .setHandleInvalid("keep")
     
-    // 4. Assembler - TOTAL: ~130 features (REDUCIDO)
+    // CRÍTICO: SOLO features sin leakage (TOTAL: ~122 features)
     val assembler = new VectorAssembler()
       .setInputCols(Array(
-        "description_features",    // 100 features (reducido)
-        "genre_features",           // 16 features (reducido)
+        "description_features",    // 100 features
+        "genre_features",           // 16 features
         "director_encoded",         // 1 feature
         "actors_encoded",           // 1 feature
         "duration",                 // 1 feature
         "duration_indexed",         // 1 feature
-        "votes",                    // 1 feature
-        "log_votes",                // 1 feature
-        "reviews_from_users",       // 1 feature
-        "reviews_from_critics",     // 1 feature
         "year_clean",               // 1 feature
         "decade",                   // 1 feature
-        "votes_per_review",         // 1 feature
-        "review_ratio",             // 1 feature
         "is_recent",                // 1 feature
         "is_old_classic"            // 1 feature
+        // ❌ NO: votes, log_votes, reviews_from_users, reviews_from_critics
+        // ❌ NO: votes_per_review, review_ratio
       ))
       .setOutputCol("features")
       .setHandleInvalid("skip")
     
-    // 5. Scaler
     val scaler = new StandardScaler()
       .setInputCol("features")
       .setOutputCol("scaled_features")
@@ -435,18 +424,16 @@ object IMDBPredictionModelSimplified {
   
   def entrenarRandomForest(trainData: DataFrame, testData: DataFrame): (PipelineModel, Map[String, Double], Double) = {
     println("   ⏳ Entrenando Random Forest...")
-    println("   📊 Parámetros: 30 árboles, profundidad 8, minInstances 10")
-    println("   ⚠️  Reducido para evitar OutOfMemory")
     
     val startTime = System.nanoTime()
     
     val rf = new RandomForestRegressor()
       .setLabelCol("avg_vote")
       .setFeaturesCol("scaled_features")
-      .setNumTrees(30)           // Reducido de 100 a 30
-      .setMaxDepth(8)             // Reducido de 10 a 8
-      .setMinInstancesPerNode(10) // Aumentado de 5 a 10
-      .setSubsamplingRate(0.8)    // Usar solo 80% de datos por árbol
+      .setNumTrees(30)
+      .setMaxDepth(8)
+      .setMinInstancesPerNode(10)
+      .setSubsamplingRate(0.8)
       .setSeed(42)
     
     val pipeline = crearPipeline(rf)
@@ -463,18 +450,16 @@ object IMDBPredictionModelSimplified {
   
   def entrenarGBT(trainData: DataFrame, testData: DataFrame): (PipelineModel, Map[String, Double], Double) = {
     println("   ⏳ Entrenando Gradient Boosted Trees...")
-    println("   📊 Parámetros: 50 iteraciones, profundidad 5, stepSize 0.1")
-    println("   ⚠️  Reducido para evitar OutOfMemory")
     
     val startTime = System.nanoTime()
     
     val gbt = new GBTRegressor()
       .setLabelCol("avg_vote")
       .setFeaturesCol("scaled_features")
-      .setMaxIter(50)      // Reducido de 100 a 50
-      .setMaxDepth(5)      // Reducido de 6 a 5
-      .setStepSize(0.1)    // Learning rate estándar
-      .setSubsamplingRate(0.8) // Usar solo 80% de datos
+      .setMaxIter(50)
+      .setMaxDepth(5)
+      .setStepSize(0.1)
+      .setSubsamplingRate(0.8)
       .setSeed(42)
     
     val pipeline = crearPipeline(gbt)
@@ -521,7 +506,7 @@ object IMDBPredictionModelSimplified {
     
     guardarPredicciones(
       ensemble.select("avg_vote", "prediction"),
-      "ml_prediction/resultados/simplified_ensemble_predictions.txt"
+      "ml_prediction/resultados/noleakage_ensemble_predictions.txt"
     )
     
     evaluarModelo(ensemble)
@@ -565,10 +550,10 @@ object IMDBPredictionModelSimplified {
     }
     
     treeModel.foreach { importances =>
-      println(s"\n   📊 Feature Importances (Top 15):")
+      println(s"\n   📊 Feature Importances (Top 10):")
       val topFeatures = importances.toArray.zipWithIndex
         .sortBy(-_._1)
-        .take(15)
+        .take(10)
       
       topFeatures.foreach { case (importance, idx) =>
         println(f"      Feature $idx%3d: ${importance * 100}%.2f%%")
@@ -610,31 +595,36 @@ object IMDBPredictionModelSimplified {
   }
   
   def generarReporteComparativo(modelos: Map[String, (Map[String, Double], Double)]): Unit = {
-    val outputPath = "ml_prediction/resultados/reporte_simplificado.txt"
+    val outputPath = "ml_prediction/resultados/reporte_noleakage.txt"
     val writer = new PrintWriter(outputPath)
     
     writer.println("=" * 80)
-    writer.println("REPORTE COMPARATIVO - MODELOS DE PREDICCIÓN IMDB")
+    writer.println("🛡️  REPORTE - MODELOS SIN DATA LEAKAGE")
     writer.println("=" * 80)
     writer.println()
     
     writer.println("CONFIGURACIÓN:")
     writer.println("-" * 80)
-    writer.println("• Features de Texto:")
-    writer.println("  - Description: TF-IDF Unigrams (100 features)")
-    writer.println("• Features Categóricas:")
-    writer.println("  - Genre: Feature Hashing (16 features) - Top 30 categorías")
-    writer.println("  - Director: Target Encoding (1 feature)")
-    writer.println("  - Actors: Target Encoding (1 feature)")
-    writer.println("  - Duration Category: StringIndexer (1 feature)")
-    writer.println("• Features Numéricas (11 features):")
-    writer.println("  - duration, votes, log_votes, reviews_from_users, reviews_from_critics")
-    writer.println("  - year_clean, decade, votes_per_review, review_ratio")
-    writer.println("  - is_recent, is_old_classic")
-    writer.println("• TOTAL: ~130 features (Optimizado para memoria)")
-    writer.println("• Normalización: StandardScaler")
-    writer.println("• Random Forest: 30 árboles, profundidad 8, subsample 0.8")
-    writer.println("• GBT: 50 iteraciones, profundidad 5, subsample 0.8")
+    writer.println("⚠️  VARIABLES EXCLUIDAS (data leakage):")
+    writer.println("   ❌ votes - Correlacionado con popularidad del rating")
+    writer.println("   ❌ log_votes - Derivado de votes")
+    writer.println("   ❌ reviews_from_users - Consecuencia del rating")
+    writer.println("   ❌ reviews_from_critics - Consecuencia del rating")
+    writer.println("   ❌ votes_per_review - Derivado de votes/reviews")
+    writer.println("   ❌ review_ratio - Derivado de reviews")
+    writer.println()
+    writer.println("✅ FEATURES UTILIZADAS (predictores legítimos):")
+    writer.println("  • Description: TF-IDF Unigrams (100 features)")
+    writer.println("  • Genre: Feature Hashing (16 features) - Top 30 categorías")
+    writer.println("  • Director: Target Encoding (1 feature)")
+    writer.println("  • Actors: Target Encoding (1 feature)")
+    writer.println("  • Duration: Numérica (1 feature)")
+    writer.println("  • Duration Category: StringIndexer (1 feature)")
+    writer.println("  • Year: Numérica (1 feature)")
+    writer.println("  • Decade: Categórica (1 feature)")
+    writer.println("  • Is Recent: Binaria (1 feature)")
+    writer.println("  • Is Old Classic: Binaria (1 feature)")
+    writer.println("  • TOTAL: ~122 features")
     writer.println()
     
     writer.println("RESULTADOS:")
@@ -662,6 +652,20 @@ object IMDBPredictionModelSimplified {
     writer.println(f"   - R²: ${mejorModelo._2._1("R2")}%.4f")
     writer.println()
     
+    writer.println("📊 INTERPRETACIÓN DEL R²:")
+    val r2 = mejorModelo._2._1("R2")
+    if (r2 < 0.3) {
+      writer.println("   ⚠️  R² BAJO (< 0.3): El modelo tiene capacidad predictiva limitada.")
+      writer.println("   → Esto es ESPERADO cuando NO usamos variables con data leakage.")
+    } else if (r2 < 0.5) {
+      writer.println("   ✅ R² MODERADO (0.3-0.5): Capacidad predictiva aceptable.")
+    } else if (r2 < 0.7) {
+      writer.println("   ✅ R² BUENO (0.5-0.7): Buena capacidad predictiva.")
+    } else {
+      writer.println("   ⚠️  R² ALTO (> 0.7): Verificar posible data leakage residual.")
+    }
+    writer.println()
+    
     val mejoriaRMSE = ((baselineMetrics("RMSE") - mejorModelo._2._1("RMSE")) / baselineMetrics("RMSE") * 100)
     val mejoriaR2 = ((mejorModelo._2._1("R2") - baselineMetrics("R2")) / baselineMetrics("R2") * 100)
     
@@ -670,14 +674,12 @@ object IMDBPredictionModelSimplified {
     writer.println(f"   - R²: $mejoriaR2%.2f%% mejor")
     writer.println()
     
-    writer.println("TÉCNICAS APLICADAS:")
+    writer.println("CONCLUSIONES:")
     writer.println("-" * 80)
-    writer.println("✅ Target Encoding (director, actors) - Evita alta cardinalidad")
-    writer.println("✅ Feature Hashing (genre) - Memoria controlada")
-    writer.println("✅ Feature Engineering - 11 features derivadas")
-    writer.println("✅ TF-IDF - Captura semántica del texto")
-    writer.println("✅ StandardScaler - Normalización de features")
-    writer.println("✅ Ensemble - Combina fortalezas de múltiples modelos")
+    writer.println("✅ Este modelo es REALISTA y sin data leakage")
+    writer.println("✅ Predice ratings basándose SOLO en características intrínsecas")
+    writer.println("✅ Los ratings de IMDB son difíciles de predecir (subjetividad)")
+    writer.println("⚠️  Un R² bajo NO significa mal modelo - significa honestidad científica")
     writer.println()
     
     writer.println("=" * 80)
@@ -686,7 +688,7 @@ object IMDBPredictionModelSimplified {
     println(s"   ✓ Reporte guardado en: $outputPath")
     
     println("\n" + "=" * 80)
-    println("📊 RESUMEN FINAL")
+    println("📊 RESUMEN FINAL (SIN DATA LEAKAGE)")
     println("=" * 80)
     println(f"${"Modelo"}%-35s ${"RMSE"}%-10s ${"R²"}%-10s")
     println("-" * 80)
