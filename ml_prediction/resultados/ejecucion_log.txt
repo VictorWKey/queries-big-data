@@ -1,0 +1,23 @@
+25/11/08 18:54:06 WARN Utils: Your hostname, victorwkey resolves to a loopback address: 127.0.1.1; using 192.168.0.13 instead (on interface wlp2s0)
+25/11/08 18:54:06 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+25/11/08 18:54:10 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Spark context Web UI available at http://192.168.0.13:4040
+Spark context available as 'sc' (master = local[*], app id = local-1762649650852).
+Spark session available as 'spark'.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /___/ .__/\_,_/_/ /_/\_\   version 3.3.1
+      /_/
+         
+Using Scala version 2.12.15 (OpenJDK 64-Bit Server VM, Java 11.0.28)
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala> :Q
+No such command ':Q'.  Type :help for help.
+
+scala> :q

@@ -1,0 +1,26 @@
+================================================================================
+MUESTRA DE PREDICCIONES (Top 20 mayores errores)
+================================================================================
+
+Título                                               Real   Pred  Error
+--------------------------------------------------------------------------------
+Frankenpimp                                          1.20   7.00   5.80
+Ram Gopal Varma Ki Aag                               1.70   6.63   4.93
+Duello col pirata nero                               4.60   9.49   4.89
+Dil Bechara                                          8.80   3.95   4.85
+Acid Head: The Buzzard Nuts County Slaughter         1.40   6.24   4.84
+Pakka                                                1.50   6.17   4.67
+Chatur Singh Two Star                                1.70   6.34   4.64
+The Butterfly Ball                                   1.30   5.77   4.47
+I vampiri                                            7.30  11.67   4.37
+Ebolusyon ng isang pamilyang Pilipino                7.80  12.12   4.32
+Reel Horror                                          1.50   5.68   4.18
+Hopeful Notes                                        9.70   5.52   4.18
+My Big Phat Hip Hop Family                           1.60   5.72   4.12
+Going Overboard                                      1.80   5.92   4.12
+The Hellcats                                         1.90   6.01   4.11
+Veerabhadra                                          2.60   6.71   4.11
+Thunderstorm: The Return of Thor                     1.20   5.31   4.11
+The Force on Thunder Mountain                        1.80   5.88   4.08
+Inchon                                               2.50   6.56   4.06
+Bushido la spada del sole                            2.00   6.05   4.05

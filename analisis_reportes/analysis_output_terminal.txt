@@ -1,0 +1,1271 @@
+scala> IMDBExploratoryAnalysis.main(Array())
+25/11/08 18:25:10 WARN SparkSession: Using an existing Spark session; only runtime SQL configurations will take effect.
+================================================================================
+ANÁLISIS EXPLORATORIO - IMDB MOVIES DATASET
+================================================================================
+                                                                                
+================================================================================
+1. DATASET: IMDB MOVIES
+================================================================================
+
+--- Dimensiones del dataset ---
+Total de filas: 85855
+Total de columnas: 22
+
+--- Columnas disponibles ---
+ 1. imdb_title_id
+ 2. title
+ 3. original_title
+ 4. year
+ 5. date_published
+ 6. genre
+ 7. duration
+ 8. country
+ 9. language
+10. director
+11. writer
+12. production_company
+13. actors
+14. description
+15. avg_vote
+16. votes
+17. budget
+18. usa_gross_income
+19. worlwide_gross_income
+20. metascore
+21. reviews_from_users
+22. reviews_from_critics
+
+--- Tipos de datos ---
+imdb_title_id                  -> StringType
+title                          -> StringType
+original_title                 -> StringType
+year                           -> StringType
+date_published                 -> StringType
+genre                          -> StringType
+duration                       -> IntegerType
+country                        -> StringType
+language                       -> StringType
+director                       -> StringType
+writer                         -> StringType
+production_company             -> StringType
+actors                         -> StringType
+description                    -> StringType
+avg_vote                       -> DoubleType
+votes                          -> IntegerType
+budget                         -> StringType
+usa_gross_income               -> StringType
+worlwide_gross_income          -> StringType
+metascore                      -> DoubleType
+reviews_from_users             -> DoubleType
+reviews_from_critics           -> DoubleType
+
+--- Valores nulos por columna ---
+imdb_title_id                 :      0 nulos ( 0.00%)
+title                         :      0 nulos ( 0.00%)
+original_title                :      0 nulos ( 0.00%)
+year                          :      0 nulos ( 0.00%)
+date_published                :      0 nulos ( 0.00%)
+genre                         :      0 nulos ( 0.00%)
+duration                      :      0 nulos ( 0.00%)
+country                       :     64 nulos ( 0.07%)
+language                      :    833 nulos ( 0.97%)
+director                      :     87 nulos ( 0.10%)
+writer                        :   1572 nulos ( 1.83%)
+production_company            :   4455 nulos ( 5.19%)
+actors                        :     69 nulos ( 0.08%)
+description                   :   2115 nulos ( 2.46%)
+avg_vote                      :      0 nulos ( 0.00%)
+votes                         :      0 nulos ( 0.00%)
+budget                        :  62145 nulos (72.38%)
+usa_gross_income              :  70529 nulos (82.15%)
+worlwide_gross_income         :  54839 nulos (63.87%)
+metascore                     :  72550 nulos (84.50%)
+reviews_from_users            :   7597 nulos ( 8.85%)
+reviews_from_critics          :  11797 nulos (13.74%)
+
+--- Muestra de datos (primeras 5 filas) ---
+Mostrando las 22 columnas completas...
+
+[Consola - Truncado a 40 caracteres]
++-------------+---------------------------+---------------------------+----+--------------+-------------------------+--------+----------------+--------+-----------------------------------+-------------------------------------+-----------------------------+----------------------------------------+----------------------------------------+--------+-----+-------+----------------+---------------------+---------+------------------+--------------------+
+|imdb_title_id|                      title|             original_title|year|date_published|                    genre|duration|         country|language|                           director|                               writer|           production_company|                                  actors|                             description|avg_vote|votes| budget|usa_gross_income|worlwide_gross_income|metascore|reviews_from_users|reviews_from_critics|
++-------------+---------------------------+---------------------------+----+--------------+-------------------------+--------+----------------+--------+-----------------------------------+-------------------------------------+-----------------------------+----------------------------------------+----------------------------------------+--------+-----+-------+----------------+---------------------+---------+------------------+--------------------+
+|    tt0000009|                 Miss Jerry|                 Miss Jerry|1894|    1894-10-09|                  Romance|      45|             USA|    None|                    Alexander Black|                      Alexander Black|   Alexander Black Photoplays|Blanche Bayliss, William Courtenay, C...|The adventures of a female reporter i...|     5.9|  154|   null|            null|                 null|     null|               1.0|                 2.0|
+|    tt0000574|The Story of the Kelly Gang|The Story of the Kelly Gang|1906|    1906-12-26|  Biography, Crime, Drama|      70|       Australia|    None|                       Charles Tait|                         Charles Tait|               J. and N. Tait|Elizabeth Tait, John Tait, Norman Cam...|True story of notorious Australian ou...|     6.1|  589| $ 2250|            null|                 null|     null|               7.0|                 7.0|
+|    tt0001892|             Den sorte drøm|             Den sorte drøm|1911|    1911-08-19|                    Drama|      53|Germany, Denmark|    null|                          Urban Gad|Urban Gad, Gebhard Schätzler-Perasini|                     Fotorama|Asta Nielsen, Valdemar Psilander, Gun...|Two men of high rank are both wooing ...|     5.8|  188|   null|            null|                 null|     null|               5.0|                 2.0|
+|    tt0002101|                  Cleopatra|                  Cleopatra|1912|    1912-11-13|           Drama, History|     100|             USA| English|                 Charles L. Gaskill|                     Victorien Sardou|Helen Gardner Picture Players|Helen Gardner, Pearl Sindelar, Miss F...|The fabled queen of Egypt's affair wi...|     5.2|  446|$ 45000|            null|                 null|     null|              25.0|                 3.0|
+|    tt0002130|                  L'Inferno|                  L'Inferno|1911|    1911-03-06|Adventure, Drama, Fantasy|      68|           Italy| Italian|Francesco Bertolini, Adolfo Padovan|                      Dante Alighieri|                  Milano Film|Salvatore Papa, Arturo Pirovano, Gius...|Loosely adapted from Dante's Divine C...|     7.0| 2237|   null|            null|                 null|     null|              31.0|                14.0|
++-------------+---------------------------+---------------------------+----+--------------+-------------------------+--------+----------------+--------+-----------------------------------+-------------------------------------+-----------------------------+----------------------------------------+----------------------------------------+--------+-----+-------+----------------+---------------------+---------+------------------+--------------------+
+only showing top 5 rows
+
+✓ Tabla completa guardada en: analisis_reportes/movies_muestra.txt
+
+[Formato Vertical - Más legible]
+
+--- Registro 1 ---
+  imdb_title_id                 : tt0000009
+  title                         : Miss Jerry
+  original_title                : Miss Jerry
+  year                          : 1894
+  date_published                : 1894-10-09
+  genre                         : Romance
+  duration                      : 45
+  country                       : USA
+  language                      : None
+  director                      : Alexander Black
+  writer                        : Alexander Black
+  production_company            : Alexander Black Photoplays
+  actors                        : Blanche Bayliss, William Courtenay, Chauncey Depew
+  description                   : The adventures of a female reporter in the 1890s.
+  avg_vote                      : 5.9
+  votes                         : 154
+  budget                        : null
+  usa_gross_income              : null
+  worlwide_gross_income         : null
+  metascore                     : null
+  reviews_from_users            : 1.0
+  reviews_from_critics          : 2.0
+
+--- Registro 2 ---
+  imdb_title_id                 : tt0000574
+  title                         : The Story of the Kelly Gang
+  original_title                : The Story of the Kelly Gang
+  year                          : 1906
+  date_published                : 1906-12-26
+  genre                         : Biography, Crime, Drama
+  duration                      : 70
+  country                       : Australia
+  language                      : None
+  director                      : Charles Tait
+  writer                        : Charles Tait
+  production_company            : J. and N. Tait
+  actors                        : Elizabeth Tait, John Tait, Norman Campbell, Bella Cola, Will Coyne, Sam Crewes, Jack Ennis, John Forde, Vera Linden, Mr. Marshall, Mr. McKenzie, Frank Mills, Ollie Wilson
+  description                   : True story of notorious Australian outlaw Ned Kelly (1855-80).
+  avg_vote                      : 6.1
+  votes                         : 589
+  budget                        : $ 2250
+  usa_gross_income              : null
+  worlwide_gross_income         : null
+  metascore                     : null
+  reviews_from_users            : 7.0
+  reviews_from_critics          : 7.0
+
+--- Registro 3 ---
+  imdb_title_id                 : tt0001892
+  title                         : Den sorte drøm
+  original_title                : Den sorte drøm
+  year                          : 1911
+  date_published                : 1911-08-19
+  genre                         : Drama
+  duration                      : 53
+  country                       : Germany, Denmark
+  language                      : null
+  director                      : Urban Gad
+  writer                        : Urban Gad, Gebhard Schätzler-Perasini
+  production_company            : Fotorama
+  actors                        : Asta Nielsen, Valdemar Psilander, Gunnar Helsengreen, Emil Albes, Hugo Flink, Mary Hagen
+  description                   : Two men of high rank are both wooing the beautiful and famous equestrian acrobat Stella. While Stella ignores the jeweler Hirsch, she accepts Count von Waldberg's offer to follow her home, ...
+  avg_vote                      : 5.8
+  votes                         : 188
+  budget                        : null
+  usa_gross_income              : null
+  worlwide_gross_income         : null
+  metascore                     : null
+  reviews_from_users            : 5.0
+  reviews_from_critics          : 2.0
+
+--- Registro 4 ---
+  imdb_title_id                 : tt0002101
+  title                         : Cleopatra
+  original_title                : Cleopatra
+  year                          : 1912
+  date_published                : 1912-11-13
+  genre                         : Drama, History
+  duration                      : 100
+  country                       : USA
+  language                      : English
+  director                      : Charles L. Gaskill
+  writer                        : Victorien Sardou
+  production_company            : Helen Gardner Picture Players
+  actors                        : Helen Gardner, Pearl Sindelar, Miss Fielding, Miss Robson, Helene Costello, Charles Sindelar, Mr. Howard, James R. Waite, Mr. Osborne, Harry Knowles, Mr. Paul, Mr. Brady, Mr. Corker
+  description                   : The fabled queen of Egypt's affair with Roman general Marc Antony is ultimately disastrous for both of them.
+  avg_vote                      : 5.2
+  votes                         : 446
+  budget                        : $ 45000
+  usa_gross_income              : null
+  worlwide_gross_income         : null
+  metascore                     : null
+  reviews_from_users            : 25.0
+  reviews_from_critics          : 3.0
+
+--- Registro 5 ---
+  imdb_title_id                 : tt0002130
+  title                         : L'Inferno
+  original_title                : L'Inferno
+  year                          : 1911
+  date_published                : 1911-03-06
+  genre                         : Adventure, Drama, Fantasy
+  duration                      : 68
+  country                       : Italy
+  language                      : Italian
+  director                      : Francesco Bertolini, Adolfo Padovan
+  writer                        : Dante Alighieri
+  production_company            : Milano Film
+  actors                        : Salvatore Papa, Arturo Pirovano, Giuseppe de Liguoro, Pier Delle Vigne, Augusto Milla, Attilio Motta, Emilise Beretta
+  description                   : Loosely adapted from Dante's Divine Comedy and inspired by the illustrations of Gustav Doré the original silent film has been restored and has a new score by Tangerine Dream.
+  avg_vote                      : 7.0
+  votes                         : 2237
+  budget                        : null
+  usa_gross_income              : null
+  worlwide_gross_income         : null
+  metascore                     : null
+  reviews_from_users            : 31.0
+  reviews_from_critics          : 14.0
+
+--- Estadísticas descriptivas (columnas numéricas) ---
+
+[Consola - Truncado a 40 caracteres]
++-------+------------------+------------------+
+|summary|              year|          duration|
++-------+------------------+------------------+
+|  count|             85855|             85855|
+|   mean|1993.5005940317283|100.35141808863781|
+| stddev|24.216404516823825|22.553847985369135|
+|    min|              1894|                41|
+|    max|     TV Movie 2019|               808|
++-------+------------------+------------------+
+
+✓ Tabla completa guardada en: analisis_reportes/movies_stats.txt
+
+================================================================================
+2. DATASET: IMDB RATINGS
+================================================================================
+
+--- Dimensiones del dataset ---
+Total de filas: 85855
+Total de columnas: 49
+
+--- Columnas disponibles ---
+ 1. imdb_title_id
+ 2. weighted_average_vote
+ 3. total_votes
+ 4. mean_vote
+ 5. median_vote
+ 6. votes_10
+ 7. votes_9
+ 8. votes_8
+ 9. votes_7
+10. votes_6
+11. votes_5
+12. votes_4
+13. votes_3
+14. votes_2
+15. votes_1
+16. allgenders_0age_avg_vote
+17. allgenders_0age_votes
+18. allgenders_18age_avg_vote
+19. allgenders_18age_votes
+20. allgenders_30age_avg_vote
+21. allgenders_30age_votes
+22. allgenders_45age_avg_vote
+23. allgenders_45age_votes
+24. males_allages_avg_vote
+25. males_allages_votes
+26. males_0age_avg_vote
+27. males_0age_votes
+28. males_18age_avg_vote
+29. males_18age_votes
+30. males_30age_avg_vote
+31. males_30age_votes
+32. males_45age_avg_vote
+33. males_45age_votes
+34. females_allages_avg_vote
+35. females_allages_votes
+36. females_0age_avg_vote
+37. females_0age_votes
+38. females_18age_avg_vote
+39. females_18age_votes
+40. females_30age_avg_vote
+41. females_30age_votes
+42. females_45age_avg_vote
+43. females_45age_votes
+44. top1000_voters_rating
+45. top1000_voters_votes
+46. us_voters_rating
+47. us_voters_votes
+48. non_us_voters_rating
+49. non_us_voters_votes
+
+--- Tipos de datos ---
+imdb_title_id                  -> StringType
+weighted_average_vote          -> DoubleType
+total_votes                    -> IntegerType
+mean_vote                      -> DoubleType
+median_vote                    -> DoubleType
+votes_10                       -> IntegerType
+votes_9                        -> IntegerType
+votes_8                        -> IntegerType
+votes_7                        -> IntegerType
+votes_6                        -> IntegerType
+votes_5                        -> IntegerType
+votes_4                        -> IntegerType
+votes_3                        -> IntegerType
+votes_2                        -> IntegerType
+votes_1                        -> IntegerType
+allgenders_0age_avg_vote       -> DoubleType
+allgenders_0age_votes          -> DoubleType
+allgenders_18age_avg_vote      -> DoubleType
+allgenders_18age_votes         -> DoubleType
+allgenders_30age_avg_vote      -> DoubleType
+allgenders_30age_votes         -> DoubleType
+allgenders_45age_avg_vote      -> DoubleType
+allgenders_45age_votes         -> DoubleType
+males_allages_avg_vote         -> DoubleType
+males_allages_votes            -> DoubleType
+males_0age_avg_vote            -> DoubleType
+males_0age_votes               -> DoubleType
+males_18age_avg_vote           -> DoubleType
+males_18age_votes              -> DoubleType
+males_30age_avg_vote           -> DoubleType
+males_30age_votes              -> DoubleType
+males_45age_avg_vote           -> DoubleType
+males_45age_votes              -> DoubleType
+females_allages_avg_vote       -> DoubleType
+females_allages_votes          -> DoubleType
+females_0age_avg_vote          -> DoubleType
+females_0age_votes             -> DoubleType
+females_18age_avg_vote         -> DoubleType
+females_18age_votes            -> DoubleType
+females_30age_avg_vote         -> DoubleType
+females_30age_votes            -> DoubleType
+females_45age_avg_vote         -> DoubleType
+females_45age_votes            -> DoubleType
+top1000_voters_rating          -> DoubleType
+top1000_voters_votes           -> DoubleType
+us_voters_rating               -> DoubleType
+us_voters_votes                -> DoubleType
+non_us_voters_rating           -> DoubleType
+non_us_voters_votes            -> DoubleType
+
+--- Valores nulos por columna ---
+imdb_title_id                 :      0 nulos ( 0.00%)
+weighted_average_vote         :      0 nulos ( 0.00%)
+total_votes                   :      0 nulos ( 0.00%)
+mean_vote                     :      0 nulos ( 0.00%)
+median_vote                   :      0 nulos ( 0.00%)
+votes_10                      :      0 nulos ( 0.00%)
+votes_9                       :      0 nulos ( 0.00%)
+votes_8                       :      0 nulos ( 0.00%)
+votes_7                       :      0 nulos ( 0.00%)
+votes_6                       :      0 nulos ( 0.00%)
+votes_5                       :      0 nulos ( 0.00%)
+votes_4                       :      0 nulos ( 0.00%)
+votes_3                       :      0 nulos ( 0.00%)
+votes_2                       :      0 nulos ( 0.00%)
+votes_1                       :      0 nulos ( 0.00%)
+allgenders_0age_avg_vote      :  52496 nulos (61.14%)
+allgenders_0age_votes         :  52496 nulos (61.14%)
+allgenders_18age_avg_vote     :    706 nulos ( 0.82%)
+allgenders_18age_votes        :    706 nulos ( 0.82%)
+allgenders_30age_avg_vote     :     10 nulos ( 0.01%)
+allgenders_30age_votes        :     10 nulos ( 0.01%)
+allgenders_45age_avg_vote     :     80 nulos ( 0.09%)
+allgenders_45age_votes        :     80 nulos ( 0.09%)
+males_allages_avg_vote        :      1 nulos ( 0.00%)
+males_allages_votes           :      1 nulos ( 0.00%)
+males_0age_avg_vote           :  58444 nulos (68.07%)
+males_0age_votes              :  58444 nulos (68.07%)
+males_18age_avg_vote          :   1465 nulos ( 1.71%)
+males_18age_votes             :   1465 nulos ( 1.71%)
+males_30age_avg_vote          :     12 nulos ( 0.01%)
+males_30age_votes             :     12 nulos ( 0.01%)
+males_45age_avg_vote          :    101 nulos ( 0.12%)
+males_45age_votes             :    101 nulos ( 0.12%)
+females_allages_avg_vote      :     81 nulos ( 0.09%)
+females_allages_votes         :     81 nulos ( 0.09%)
+females_0age_avg_vote         :  63738 nulos (74.24%)
+females_0age_votes            :  63738 nulos (74.24%)
+females_18age_avg_vote        :   6521 nulos ( 7.60%)
+females_18age_votes           :   6521 nulos ( 7.60%)
+females_30age_avg_vote        :    944 nulos ( 1.10%)
+females_30age_votes           :    944 nulos ( 1.10%)
+females_45age_avg_vote        :   2798 nulos ( 3.26%)
+females_45age_votes           :   2798 nulos ( 3.26%)
+top1000_voters_rating         :    679 nulos ( 0.79%)
+top1000_voters_votes          :    679 nulos ( 0.79%)
+us_voters_rating              :    209 nulos ( 0.24%)
+us_voters_votes               :    209 nulos ( 0.24%)
+non_us_voters_rating          :      1 nulos ( 0.00%)
+non_us_voters_votes           :      1 nulos ( 0.00%)
+
+--- Muestra de datos (primeras 5 filas) ---
+Mostrando las 49 columnas completas...
+
+[Consola - Truncado a 40 caracteres]
++-------------+---------------------+-----------+---------+-----------+--------+-------+-------+-------+-------+-------+-------+-------+-------+-------+------------------------+---------------------+-------------------------+----------------------+-------------------------+----------------------+-------------------------+----------------------+----------------------+-------------------+-------------------+----------------+--------------------+-----------------+--------------------+-----------------+--------------------+-----------------+------------------------+---------------------+---------------------+------------------+----------------------+-------------------+----------------------+-------------------+----------------------+-------------------+---------------------+--------------------+----------------+---------------+--------------------+-------------------+
+|imdb_title_id|weighted_average_vote|total_votes|mean_vote|median_vote|votes_10|votes_9|votes_8|votes_7|votes_6|votes_5|votes_4|votes_3|votes_2|votes_1|allgenders_0age_avg_vote|allgenders_0age_votes|allgenders_18age_avg_vote|allgenders_18age_votes|allgenders_30age_avg_vote|allgenders_30age_votes|allgenders_45age_avg_vote|allgenders_45age_votes|males_allages_avg_vote|males_allages_votes|males_0age_avg_vote|males_0age_votes|males_18age_avg_vote|males_18age_votes|males_30age_avg_vote|males_30age_votes|males_45age_avg_vote|males_45age_votes|females_allages_avg_vote|females_allages_votes|females_0age_avg_vote|females_0age_votes|females_18age_avg_vote|females_18age_votes|females_30age_avg_vote|females_30age_votes|females_45age_avg_vote|females_45age_votes|top1000_voters_rating|top1000_voters_votes|us_voters_rating|us_voters_votes|non_us_voters_rating|non_us_voters_votes|
++-------------+---------------------+-----------+---------+-----------+--------+-------+-------+-------+-------+-------+-------+-------+-------+-------+------------------------+---------------------+-------------------------+----------------------+-------------------------+----------------------+-------------------------+----------------------+----------------------+-------------------+-------------------+----------------+--------------------+-----------------+--------------------+-----------------+--------------------+-----------------+------------------------+---------------------+---------------------+------------------+----------------------+-------------------+----------------------+-------------------+----------------------+-------------------+---------------------+--------------------+----------------+---------------+--------------------+-------------------+
+|    tt0000009|                  5.9|        154|      5.9|        6.0|      12|      4|     10|     43|     28|     28|      9|      1|      5|     14|                     7.2|                  4.0|                      6.0|                  38.0|                      5.7|                  50.0|                      6.6|                  35.0|                   6.2|               97.0|                7.0|             1.0|                 5.9|             24.0|                 5.6|             36.0|                 6.7|             31.0|                     6.0|                 35.0|                  7.3|               3.0|                   5.9|               14.0|                   5.7|               13.0|                   4.5|                4.0|                  5.7|                34.0|             6.4|           51.0|                 6.0|               70.0|
+|    tt0000574|                  6.1|        589|      6.3|        6.0|      57|     18|     58|    137|    139|    103|     28|     20|     13|     16|                     6.0|                  1.0|                      6.1|                 114.0|                      6.0|                 239.0|                      6.3|                 115.0|                   6.1|              425.0|                6.0|             1.0|                 6.2|            102.0|                 6.0|            210.0|                 6.2|            100.0|                     6.2|                 50.0|                 null|              null|                   5.9|               12.0|                   6.2|               23.0|                   6.6|               14.0|                  6.4|                66.0|             6.0|           96.0|                 6.2|              331.0|
+|    tt0001892|                  5.8|        188|      6.0|        6.0|       6|      6|     17|     44|     52|     32|     16|      5|      6|      4|                    null|                 null|                      5.5|                  25.0|                      5.8|                  72.0|                      6.2|                  62.0|                   5.9|              146.0|               null|            null|                 5.5|             21.0|                 5.9|             67.0|                 6.2|             55.0|                     5.7|                 15.0|                 null|              null|                   5.8|                4.0|                   5.8|                4.0|                   6.8|                7.0|                  5.4|                32.0|             6.2|           31.0|                 5.9|              123.0|
+|    tt0002101|                  5.2|        446|      5.3|        5.0|      15|      8|     16|     62|     98|    117|     63|     26|     25|     16|                    null|                 null|                      5.3|                  23.0|                      5.0|                 111.0|                      5.3|                 193.0|                   5.1|              299.0|               null|            null|                 5.2|             20.0|                 4.9|             96.0|                 5.2|            171.0|                     5.9|                 39.0|                 null|              null|                   5.7|                3.0|                   5.5|               14.0|                   6.1|               21.0|                  4.9|                57.0|             5.5|          207.0|                 4.7|              105.0|
+|    tt0002130|                  7.0|       2237|      6.9|        7.0|     210|    225|    436|    641|    344|    169|     66|     39|     20|     87|                     7.5|                  4.0|                      7.0|                 402.0|                      7.0|                 895.0|                      7.1|                 482.0|                   7.0|             1607.0|                8.0|             2.0|                 7.0|            346.0|                 7.0|            804.0|                 7.0|            396.0|                     7.2|                215.0|                  7.0|               2.0|                   7.0|               52.0|                   7.3|               82.0|                   7.4|               77.0|                  6.9|               139.0|             7.0|          488.0|                 7.0|             1166.0|
++-------------+---------------------+-----------+---------+-----------+--------+-------+-------+-------+-------+-------+-------+-------+-------+-------+------------------------+---------------------+-------------------------+----------------------+-------------------------+----------------------+-------------------------+----------------------+----------------------+-------------------+-------------------+----------------+--------------------+-----------------+--------------------+-----------------+--------------------+-----------------+------------------------+---------------------+---------------------+------------------+----------------------+-------------------+----------------------+-------------------+----------------------+-------------------+---------------------+--------------------+----------------+---------------+--------------------+-------------------+
+only showing top 5 rows
+
+✓ Tabla completa guardada en: analisis_reportes/ratings_muestra.txt
+
+[Formato Vertical - Más legible]
+
+--- Registro 1 ---
+  imdb_title_id                 : tt0000009
+  weighted_average_vote         : 5.9
+  total_votes                   : 154
+  mean_vote                     : 5.9
+  median_vote                   : 6.0
+  votes_10                      : 12
+  votes_9                       : 4
+  votes_8                       : 10
+  votes_7                       : 43
+  votes_6                       : 28
+  votes_5                       : 28
+  votes_4                       : 9
+  votes_3                       : 1
+  votes_2                       : 5
+  votes_1                       : 14
+  allgenders_0age_avg_vote      : 7.2
+  allgenders_0age_votes         : 4.0
+  allgenders_18age_avg_vote     : 6.0
+  allgenders_18age_votes        : 38.0
+  allgenders_30age_avg_vote     : 5.7
+  allgenders_30age_votes        : 50.0
+  allgenders_45age_avg_vote     : 6.6
+  allgenders_45age_votes        : 35.0
+  males_allages_avg_vote        : 6.2
+  males_allages_votes           : 97.0
+  males_0age_avg_vote           : 7.0
+  males_0age_votes              : 1.0
+  males_18age_avg_vote          : 5.9
+  males_18age_votes             : 24.0
+  males_30age_avg_vote          : 5.6
+  males_30age_votes             : 36.0
+  males_45age_avg_vote          : 6.7
+  males_45age_votes             : 31.0
+  females_allages_avg_vote      : 6.0
+  females_allages_votes         : 35.0
+  females_0age_avg_vote         : 7.3
+  females_0age_votes            : 3.0
+  females_18age_avg_vote        : 5.9
+  females_18age_votes           : 14.0
+  females_30age_avg_vote        : 5.7
+  females_30age_votes           : 13.0
+  females_45age_avg_vote        : 4.5
+  females_45age_votes           : 4.0
+  top1000_voters_rating         : 5.7
+  top1000_voters_votes          : 34.0
+  us_voters_rating              : 6.4
+  us_voters_votes               : 51.0
+  non_us_voters_rating          : 6.0
+  non_us_voters_votes           : 70.0
+
+--- Registro 2 ---
+  imdb_title_id                 : tt0000574
+  weighted_average_vote         : 6.1
+  total_votes                   : 589
+  mean_vote                     : 6.3
+  median_vote                   : 6.0
+  votes_10                      : 57
+  votes_9                       : 18
+  votes_8                       : 58
+  votes_7                       : 137
+  votes_6                       : 139
+  votes_5                       : 103
+  votes_4                       : 28
+  votes_3                       : 20
+  votes_2                       : 13
+  votes_1                       : 16
+  allgenders_0age_avg_vote      : 6.0
+  allgenders_0age_votes         : 1.0
+  allgenders_18age_avg_vote     : 6.1
+  allgenders_18age_votes        : 114.0
+  allgenders_30age_avg_vote     : 6.0
+  allgenders_30age_votes        : 239.0
+  allgenders_45age_avg_vote     : 6.3
+  allgenders_45age_votes        : 115.0
+  males_allages_avg_vote        : 6.1
+  males_allages_votes           : 425.0
+  males_0age_avg_vote           : 6.0
+  males_0age_votes              : 1.0
+  males_18age_avg_vote          : 6.2
+  males_18age_votes             : 102.0
+  males_30age_avg_vote          : 6.0
+  males_30age_votes             : 210.0
+  males_45age_avg_vote          : 6.2
+  males_45age_votes             : 100.0
+  females_allages_avg_vote      : 6.2
+  females_allages_votes         : 50.0
+  females_0age_avg_vote         : null
+  females_0age_votes            : null
+  females_18age_avg_vote        : 5.9
+  females_18age_votes           : 12.0
+  females_30age_avg_vote        : 6.2
+  females_30age_votes           : 23.0
+  females_45age_avg_vote        : 6.6
+  females_45age_votes           : 14.0
+  top1000_voters_rating         : 6.4
+  top1000_voters_votes          : 66.0
+  us_voters_rating              : 6.0
+  us_voters_votes               : 96.0
+  non_us_voters_rating          : 6.2
+  non_us_voters_votes           : 331.0
+
+--- Registro 3 ---
+  imdb_title_id                 : tt0001892
+  weighted_average_vote         : 5.8
+  total_votes                   : 188
+  mean_vote                     : 6.0
+  median_vote                   : 6.0
+  votes_10                      : 6
+  votes_9                       : 6
+  votes_8                       : 17
+  votes_7                       : 44
+  votes_6                       : 52
+  votes_5                       : 32
+  votes_4                       : 16
+  votes_3                       : 5
+  votes_2                       : 6
+  votes_1                       : 4
+  allgenders_0age_avg_vote      : null
+  allgenders_0age_votes         : null
+  allgenders_18age_avg_vote     : 5.5
+  allgenders_18age_votes        : 25.0
+  allgenders_30age_avg_vote     : 5.8
+  allgenders_30age_votes        : 72.0
+  allgenders_45age_avg_vote     : 6.2
+  allgenders_45age_votes        : 62.0
+  males_allages_avg_vote        : 5.9
+  males_allages_votes           : 146.0
+  males_0age_avg_vote           : null
+  males_0age_votes              : null
+  males_18age_avg_vote          : 5.5
+  males_18age_votes             : 21.0
+  males_30age_avg_vote          : 5.9
+  males_30age_votes             : 67.0
+  males_45age_avg_vote          : 6.2
+  males_45age_votes             : 55.0
+  females_allages_avg_vote      : 5.7
+  females_allages_votes         : 15.0
+  females_0age_avg_vote         : null
+  females_0age_votes            : null
+  females_18age_avg_vote        : 5.8
+  females_18age_votes           : 4.0
+  females_30age_avg_vote        : 5.8
+  females_30age_votes           : 4.0
+  females_45age_avg_vote        : 6.8
+  females_45age_votes           : 7.0
+  top1000_voters_rating         : 5.4
+  top1000_voters_votes          : 32.0
+  us_voters_rating              : 6.2
+  us_voters_votes               : 31.0
+  non_us_voters_rating          : 5.9
+  non_us_voters_votes           : 123.0
+
+--- Registro 4 ---
+  imdb_title_id                 : tt0002101
+  weighted_average_vote         : 5.2
+  total_votes                   : 446
+  mean_vote                     : 5.3
+  median_vote                   : 5.0
+  votes_10                      : 15
+  votes_9                       : 8
+  votes_8                       : 16
+  votes_7                       : 62
+  votes_6                       : 98
+  votes_5                       : 117
+  votes_4                       : 63
+  votes_3                       : 26
+  votes_2                       : 25
+  votes_1                       : 16
+  allgenders_0age_avg_vote      : null
+  allgenders_0age_votes         : null
+  allgenders_18age_avg_vote     : 5.3
+  allgenders_18age_votes        : 23.0
+  allgenders_30age_avg_vote     : 5.0
+  allgenders_30age_votes        : 111.0
+  allgenders_45age_avg_vote     : 5.3
+  allgenders_45age_votes        : 193.0
+  males_allages_avg_vote        : 5.1
+  males_allages_votes           : 299.0
+  males_0age_avg_vote           : null
+  males_0age_votes              : null
+  males_18age_avg_vote          : 5.2
+  males_18age_votes             : 20.0
+  males_30age_avg_vote          : 4.9
+  males_30age_votes             : 96.0
+  males_45age_avg_vote          : 5.2
+  males_45age_votes             : 171.0
+  females_allages_avg_vote      : 5.9
+  females_allages_votes         : 39.0
+  females_0age_avg_vote         : null
+  females_0age_votes            : null
+  females_18age_avg_vote        : 5.7
+  females_18age_votes           : 3.0
+  females_30age_avg_vote        : 5.5
+  females_30age_votes           : 14.0
+  females_45age_avg_vote        : 6.1
+  females_45age_votes           : 21.0
+  top1000_voters_rating         : 4.9
+  top1000_voters_votes          : 57.0
+  us_voters_rating              : 5.5
+  us_voters_votes               : 207.0
+  non_us_voters_rating          : 4.7
+  non_us_voters_votes           : 105.0
+
+--- Registro 5 ---
+  imdb_title_id                 : tt0002130
+  weighted_average_vote         : 7.0
+  total_votes                   : 2237
+  mean_vote                     : 6.9
+  median_vote                   : 7.0
+  votes_10                      : 210
+  votes_9                       : 225
+  votes_8                       : 436
+  votes_7                       : 641
+  votes_6                       : 344
+  votes_5                       : 169
+  votes_4                       : 66
+  votes_3                       : 39
+  votes_2                       : 20
+  votes_1                       : 87
+  allgenders_0age_avg_vote      : 7.5
+  allgenders_0age_votes         : 4.0
+  allgenders_18age_avg_vote     : 7.0
+  allgenders_18age_votes        : 402.0
+  allgenders_30age_avg_vote     : 7.0
+  allgenders_30age_votes        : 895.0
+  allgenders_45age_avg_vote     : 7.1
+  allgenders_45age_votes        : 482.0
+  males_allages_avg_vote        : 7.0
+  males_allages_votes           : 1607.0
+  males_0age_avg_vote           : 8.0
+  males_0age_votes              : 2.0
+  males_18age_avg_vote          : 7.0
+  males_18age_votes             : 346.0
+  males_30age_avg_vote          : 7.0
+  males_30age_votes             : 804.0
+  males_45age_avg_vote          : 7.0
+  males_45age_votes             : 396.0
+  females_allages_avg_vote      : 7.2
+  females_allages_votes         : 215.0
+  females_0age_avg_vote         : 7.0
+  females_0age_votes            : 2.0
+  females_18age_avg_vote        : 7.0
+  females_18age_votes           : 52.0
+  females_30age_avg_vote        : 7.3
+  females_30age_votes           : 82.0
+  females_45age_avg_vote        : 7.4
+  females_45age_votes           : 77.0
+  top1000_voters_rating         : 6.9
+  top1000_voters_votes          : 139.0
+  us_voters_rating              : 7.0
+  us_voters_votes               : 488.0
+  non_us_voters_rating          : 7.0
+  non_us_voters_votes           : 1166.0
+
+--- Estadísticas descriptivas (columnas numéricas) ---
+
+[Consola - Truncado a 40 caracteres]
++-------+---------------------+-----------------+------------------+------------------+
+|summary|weighted_average_vote|      total_votes|         mean_vote|       median_vote|
++-------+---------------------+-----------------+------------------+------------------+
+|  count|                85855|            85855|             85855|             85855|
+|   mean|    5.898655873274723|9493.489604565837| 6.226342088404855| 6.267852775027663|
+| stddev|   1.2349873512977323|53574.35954323715|1.1552795225340589|1.4811681321829133|
+|    min|                  1.0|               99|               1.0|               1.0|
+|    max|                  9.9|          2278845|               9.8|              10.0|
++-------+---------------------+-----------------+------------------+------------------+
+
+✓ Tabla completa guardada en: analisis_reportes/ratings_stats.txt
+
+================================================================================
+3. DATASET JOINEADO: MOVIES + RATINGS
+================================================================================
+
+--- Dimensiones del dataset joineado ---
+Total de filas: 85855
+Total de columnas: 70
+Diferencia con movies original: 0 filas (0.0%.2f%% perdidas en el join)
+
+--- Columnas disponibles en dataset joineado ---
+ 1. imdb_title_id
+ 2. title
+ 3. original_title
+ 4. year
+ 5. date_published
+ 6. genre
+ 7. duration
+ 8. country
+ 9. language
+10. director
+11. writer
+12. production_company
+13. actors
+14. description
+15. avg_vote
+16. votes
+17. budget
+18. usa_gross_income
+19. worlwide_gross_income
+20. metascore
+21. reviews_from_users
+22. reviews_from_critics
+23. weighted_average_vote
+24. total_votes
+25. mean_vote
+26. median_vote
+27. votes_10
+28. votes_9
+29. votes_8
+30. votes_7
+31. votes_6
+32. votes_5
+33. votes_4
+34. votes_3
+35. votes_2
+36. votes_1
+37. allgenders_0age_avg_vote
+38. allgenders_0age_votes
+39. allgenders_18age_avg_vote
+40. allgenders_18age_votes
+41. allgenders_30age_avg_vote
+42. allgenders_30age_votes
+43. allgenders_45age_avg_vote
+44. allgenders_45age_votes
+45. males_allages_avg_vote
+46. males_allages_votes
+47. males_0age_avg_vote
+48. males_0age_votes
+49. males_18age_avg_vote
+50. males_18age_votes
+51. males_30age_avg_vote
+52. males_30age_votes
+53. males_45age_avg_vote
+54. males_45age_votes
+55. females_allages_avg_vote
+56. females_allages_votes
+57. females_0age_avg_vote
+58. females_0age_votes
+59. females_18age_avg_vote
+60. females_18age_votes
+61. females_30age_avg_vote
+62. females_30age_votes
+63. females_45age_avg_vote
+64. females_45age_votes
+65. top1000_voters_rating
+66. top1000_voters_votes
+67. us_voters_rating
+68. us_voters_votes
+69. non_us_voters_rating
+70. non_us_voters_votes
+
+--- Valores nulos por columna (dataset joineado) ---
+imdb_title_id                      :      0 nulos ( 0.00%)
+title                              :      0 nulos ( 0.00%)
+original_title                     :      0 nulos ( 0.00%)
+year                               :      0 nulos ( 0.00%)
+date_published                     :      0 nulos ( 0.00%)
+genre                              :      0 nulos ( 0.00%)
+duration                           :      0 nulos ( 0.00%)
+country                            :     64 nulos ( 0.07%)
+language                           :    833 nulos ( 0.97%)
+director                           :     87 nulos ( 0.10%)
+writer                             :   1572 nulos ( 1.83%)
+production_company                 :   4455 nulos ( 5.19%)
+actors                             :     69 nulos ( 0.08%)
+description                        :   2115 nulos ( 2.46%)
+avg_vote                           :      0 nulos ( 0.00%)
+votes                              :      0 nulos ( 0.00%)
+budget                             :  62145 nulos (72.38%)
+usa_gross_income                   :  70529 nulos (82.15%)
+worlwide_gross_income              :  54839 nulos (63.87%)
+metascore                          :  72550 nulos (84.50%)
+reviews_from_users                 :   7597 nulos ( 8.85%)
+reviews_from_critics               :  11797 nulos (13.74%)
+weighted_average_vote              :      0 nulos ( 0.00%)
+total_votes                        :      0 nulos ( 0.00%)
+mean_vote                          :      0 nulos ( 0.00%)
+median_vote                        :      0 nulos ( 0.00%)
+votes_10                           :      0 nulos ( 0.00%)
+votes_9                            :      0 nulos ( 0.00%)
+votes_8                            :      0 nulos ( 0.00%)
+votes_7                            :      0 nulos ( 0.00%)
+votes_6                            :      0 nulos ( 0.00%)
+votes_5                            :      0 nulos ( 0.00%)
+votes_4                            :      0 nulos ( 0.00%)
+votes_3                            :      0 nulos ( 0.00%)
+votes_2                            :      0 nulos ( 0.00%)
+votes_1                            :      0 nulos ( 0.00%)
+allgenders_0age_avg_vote           :  52496 nulos (61.14%)
+allgenders_0age_votes              :  52496 nulos (61.14%)
+allgenders_18age_avg_vote          :    706 nulos ( 0.82%)
+allgenders_18age_votes             :    706 nulos ( 0.82%)
+allgenders_30age_avg_vote          :     10 nulos ( 0.01%)
+allgenders_30age_votes             :     10 nulos ( 0.01%)
+allgenders_45age_avg_vote          :     80 nulos ( 0.09%)
+allgenders_45age_votes             :     80 nulos ( 0.09%)
+males_allages_avg_vote             :      1 nulos ( 0.00%)
+males_allages_votes                :      1 nulos ( 0.00%)
+males_0age_avg_vote                :  58444 nulos (68.07%)
+males_0age_votes                   :  58444 nulos (68.07%)
+males_18age_avg_vote               :   1465 nulos ( 1.71%)
+males_18age_votes                  :   1465 nulos ( 1.71%)
+males_30age_avg_vote               :     12 nulos ( 0.01%)
+males_30age_votes                  :     12 nulos ( 0.01%)
+males_45age_avg_vote               :    101 nulos ( 0.12%)
+males_45age_votes                  :    101 nulos ( 0.12%)
+females_allages_avg_vote           :     81 nulos ( 0.09%)
+females_allages_votes              :     81 nulos ( 0.09%)
+females_0age_avg_vote              :  63738 nulos (74.24%)
+females_0age_votes                 :  63738 nulos (74.24%)
+females_18age_avg_vote             :   6521 nulos ( 7.60%)
+females_18age_votes                :   6521 nulos ( 7.60%)
+females_30age_avg_vote             :    944 nulos ( 1.10%)
+females_30age_votes                :    944 nulos ( 1.10%)
+females_45age_avg_vote             :   2798 nulos ( 3.26%)
+females_45age_votes                :   2798 nulos ( 3.26%)
+top1000_voters_rating              :    679 nulos ( 0.79%)
+top1000_voters_votes               :    679 nulos ( 0.79%)
+us_voters_rating                   :    209 nulos ( 0.24%)
+us_voters_votes                    :    209 nulos ( 0.24%)
+non_us_voters_rating               :      1 nulos ( 0.00%)
+non_us_voters_votes                :      1 nulos ( 0.00%)
+
+--- Muestra de datos joineados (primeras 5 filas) ---
+Total de columnas en el dataset joineado: 70
+
+[Consola - Truncado a 40 caracteres]
++-------------+----------------------------------------+----------------------------------------+----+--------------+----------------+--------+--------------+---------+-----------------------+--------------------------------------+--------------------------+----------------------------------------+----------------------------------------+--------+-----+-------+----------------+---------------------+---------+------------------+--------------------+---------------------+-----------+---------+-----------+--------+-------+-------+-------+-------+-------+-------+-------+-------+-------+------------------------+---------------------+-------------------------+----------------------+-------------------------+----------------------+-------------------------+----------------------+----------------------+-------------------+-------------------+----------------+--------------------+-----------------+--------------------+-----------------+--------------------+-----------------+------------------------+---------------------+---------------------+------------------+----------------------+-------------------+----------------------+-------------------+----------------------+-------------------+---------------------+--------------------+----------------+---------------+--------------------+-------------------+
+|imdb_title_id|                                   title|                          original_title|year|date_published|           genre|duration|       country| language|               director|                                writer|        production_company|                                  actors|                             description|avg_vote|votes| budget|usa_gross_income|worlwide_gross_income|metascore|reviews_from_users|reviews_from_critics|weighted_average_vote|total_votes|mean_vote|median_vote|votes_10|votes_9|votes_8|votes_7|votes_6|votes_5|votes_4|votes_3|votes_2|votes_1|allgenders_0age_avg_vote|allgenders_0age_votes|allgenders_18age_avg_vote|allgenders_18age_votes|allgenders_30age_avg_vote|allgenders_30age_votes|allgenders_45age_avg_vote|allgenders_45age_votes|males_allages_avg_vote|males_allages_votes|males_0age_avg_vote|males_0age_votes|males_18age_avg_vote|males_18age_votes|males_30age_avg_vote|males_30age_votes|males_45age_avg_vote|males_45age_votes|females_allages_avg_vote|females_allages_votes|females_0age_avg_vote|females_0age_votes|females_18age_avg_vote|females_18age_votes|females_30age_avg_vote|females_30age_votes|females_45age_avg_vote|females_45age_votes|top1000_voters_rating|top1000_voters_votes|us_voters_rating|us_voters_votes|non_us_voters_rating|non_us_voters_votes|
++-------------+----------------------------------------+----------------------------------------+----+--------------+----------------+--------+--------------+---------+-----------------------+--------------------------------------+--------------------------+----------------------------------------+----------------------------------------+--------+-----+-------+----------------+---------------------+---------+------------------+--------------------+---------------------+-----------+---------+-----------+--------+-------+-------+-------+-------+-------+-------+-------+-------+-------+------------------------+---------------------+-------------------------+----------------------+-------------------------+----------------------+-------------------------+----------------------+----------------------+-------------------+-------------------+----------------+--------------------+-----------------+--------------------+-----------------+--------------------+-----------------+------------------------+---------------------+---------------------+------------------+----------------------+-------------------+----------------------+-------------------+----------------------+-------------------+---------------------+--------------------+----------------+---------------+--------------------+-------------------+
+|    tt0069945|                               Dark Star|                               Dark Star|1974|    1979-02-09|  Comedy, Sci-Fi|      83|           USA|  English|         John Carpenter|          John Carpenter, Dan O'Bannon|Jack H. Harris Enterprises|Brian Narelle, Cal Kuniholm, Dre Pahi...|In the far reaches of space, a small ...|     6.3|21755|$ 60000|            null|                 null|     66.0|             181.0|               125.0|                  6.3|      21755|      6.6|        7.0|    2155|   1690|   3428|   5038|   4099|   2308|   1207|    783|    481|    566|                     5.3|                  7.0|                      6.5|                1557.0|                      6.2|                8654.0|                      6.5|                6161.0|                   6.3|            15641.0|                5.8|             5.0|                 6.5|           1396.0|                 6.2|           8052.0|                 6.5|           5715.0|                     6.4|               1008.0|                  4.5|               2.0|                   6.6|              133.0|                   6.3|              492.0|                   6.6|              351.0|                  6.0|               390.0|             6.2|         3960.0|                 6.3|            11321.0|
+|    tt0093985|                              Skytturnar|                              Skytturnar|1987|    1987-02-14|           Drama|      73|       Iceland|Icelandic|Friðrik Þór Friðriksson|Friðrik Þór Friðriksson, Einar Kárason|             Filmeffekt AS|Thorarinn Oskar Thorarinsson, Eggert ...|Two friends, who are experienced whal...|     6.2|  168|   null|            null|                 null|     null|              null|                 1.0|                  6.2|        168|      6.4|        6.0|      10|     12|     24|     37|     35|     26|     11|      6|      3|      4|                    null|                 null|                      6.6|                  12.0|                      6.0|                  66.0|                      6.2|                  61.0|                   6.3|              128.0|               null|            null|                 6.6|             12.0|                 6.1|             61.0|                 6.3|             53.0|                     5.3|                 11.0|                 null|              null|                  null|               null|                   5.4|                5.0|                   5.0|                6.0|                  5.4|                10.0|             6.8|            9.0|                 6.3|              123.0|
+|    tt3116438|                        Day of the Mummy|                        Day of the Mummy|2014|    2017-06-20|          Horror|      81|USA, Venezuela|  English|           Johnny Tabor|                         Garry Charles|           Omni Media Arts|Danny Glover, William McNamara, Phili...|In hope of getting his hands on the f...|     2.5|  826|   null|            null|                 null|     null|              22.0|                19.0|                  2.5|        826|      3.0|        2.0|      59|      8|      8|     13|     35|     40|     61|    118|    154|    330|                    null|                 null|                      2.5|                 103.0|                      2.4|                 331.0|                      2.6|                 213.0|                   2.5|              587.0|               null|            null|                 2.7|             87.0|                 2.3|            287.0|                 2.5|            190.0|                     2.6|                 83.0|                 null|              null|                   1.6|               16.0|                   2.6|               42.0|                   3.6|               19.0|                  2.1|                46.0|             2.8|          112.0|                 2.4|              379.0|
+|    tt5454534|                              School Bus|                              School Bus|2016|    2016-05-27|   Drama, Family|     118|         India|Malayalam|         Roshan Andrews|                 Roshan Andrews, Bobby|           AVA Productions|Aakash Muraleedharan, Angelina Roshan...|Joseph and Aparna are a couple with t...|     5.7|  214|   null|            null|                 null|     null|               1.0|                 1.0|                  5.7|        214|      5.9|        6.0|       6|      8|     11|     44|     64|     49|     18|      7|      3|      4|                    null|                 null|                      5.6|                  59.0|                      5.6|                  72.0|                      6.2|                   4.0|                   5.6|              150.0|               null|            null|                 5.6|             59.0|                 5.5|             67.0|                 6.2|              4.0|                     6.3|                  6.0|                 null|              null|                  null|               null|                   6.3|                5.0|                  null|               null|                 null|                null|             5.6|           10.0|                 5.6|               94.0|
+|    tt0002199|From the Manger to the Cross; or, Jes...|From the Manger to the Cross; or, Jes...|1912|          1913|Biography, Drama|      60|           USA|  English|          Sidney Olcott|                         Gene Gauntier|             Kalem Company|R. Henderson Bland, Percy Dyer, Gene ...|An account of the life of Jesus Chris...|     5.7|  484|   null|            null|                 null|     null|              13.0|                 5.0|                  5.7|        484|      5.8|        6.0|      33|     15|     48|     80|    123|     77|     36|     20|     18|     34|                    null|                 null|                      5.6|                  35.0|                      5.6|                 177.0|                      5.8|                 168.0|                   5.7|              354.0|               null|            null|                 5.6|             32.0|                 5.7|            159.0|                 5.8|            151.0|                     5.8|                 31.0|                 null|              null|                   6.3|                3.0|                   5.1|               13.0|                   6.5|               15.0|                  5.5|                67.0|             5.9|          173.0|                 5.6|              181.0|
++-------------+----------------------------------------+----------------------------------------+----+--------------+----------------+--------+--------------+---------+-----------------------+--------------------------------------+--------------------------+----------------------------------------+----------------------------------------+--------+-----+-------+----------------+---------------------+---------+------------------+--------------------+---------------------+-----------+---------+-----------+--------+-------+-------+-------+-------+-------+-------+-------+-------+-------+------------------------+---------------------+-------------------------+----------------------+-------------------------+----------------------+-------------------------+----------------------+----------------------+-------------------+-------------------+----------------+--------------------+-----------------+--------------------+-----------------+--------------------+-----------------+------------------------+---------------------+---------------------+------------------+----------------------+-------------------+----------------------+-------------------+----------------------+-------------------+---------------------+--------------------+----------------+---------------+--------------------+-------------------+
+only showing top 5 rows
+
+✓ Tabla completa guardada en: analisis_reportes/joined_muestra.txt
+
+[Formato Vertical - Más legible]
+
+--- Registro 1 ---
+  imdb_title_id                 : tt3116438
+  title                         : Day of the Mummy
+  original_title                : Day of the Mummy
+  year                          : 2014
+  date_published                : 2017-06-20
+  genre                         : Horror
+  duration                      : 81
+  country                       : USA, Venezuela
+  language                      : English
+  director                      : Johnny Tabor
+  writer                        : Garry Charles
+  production_company            : Omni Media Arts
+  actors                        : Danny Glover, William McNamara, Philip Marlatt, Anthony Fanelli, Andrea Monier, Nimi Adokiye, Brandon deSpain, Michael Cortez, Natalie De Luna, Eric D. Young, Tim Maloney, Robin Steffen, Brandon Hendrix, Juan Rodriguez
+  description                   : In hope of getting his hands on the famed diamond known as the Codix Stone, Jack Wells joins a group of archaeologists out to explore a newly discovered tomb in Egypt, that of the cursed ...
+  avg_vote                      : 2.5
+  votes                         : 826
+  budget                        : null
+  usa_gross_income              : null
+  worlwide_gross_income         : null
+  metascore                     : null
+  reviews_from_users            : 22.0
+  reviews_from_critics          : 19.0
+  weighted_average_vote         : 2.5
+  total_votes                   : 826
+  mean_vote                     : 3.0
+  median_vote                   : 2.0
+  votes_10                      : 59
+  votes_9                       : 8
+  votes_8                       : 8
+  votes_7                       : 13
+  votes_6                       : 35
+  votes_5                       : 40
+  votes_4                       : 61
+  votes_3                       : 118
+  votes_2                       : 154
+  votes_1                       : 330
+  allgenders_0age_avg_vote      : null
+  allgenders_0age_votes         : null
+  allgenders_18age_avg_vote     : 2.5
+  allgenders_18age_votes        : 103.0
+  allgenders_30age_avg_vote     : 2.4
+  allgenders_30age_votes        : 331.0
+  allgenders_45age_avg_vote     : 2.6
+  allgenders_45age_votes        : 213.0
+  males_allages_avg_vote        : 2.5
+  males_allages_votes           : 587.0
+  males_0age_avg_vote           : null
+  males_0age_votes              : null
+  males_18age_avg_vote          : 2.7
+  males_18age_votes             : 87.0
+  males_30age_avg_vote          : 2.3
+  males_30age_votes             : 287.0
+  males_45age_avg_vote          : 2.5
+  males_45age_votes             : 190.0
+  females_allages_avg_vote      : 2.6
+  females_allages_votes         : 83.0
+  females_0age_avg_vote         : null
+  females_0age_votes            : null
+  females_18age_avg_vote        : 1.6
+  females_18age_votes           : 16.0
+  females_30age_avg_vote        : 2.6
+  females_30age_votes           : 42.0
+  females_45age_avg_vote        : 3.6
+  females_45age_votes           : 19.0
+  top1000_voters_rating         : 2.1
+  top1000_voters_votes          : 46.0
+  us_voters_rating              : 2.8
+  us_voters_votes               : 112.0
+  non_us_voters_rating          : 2.4
+  non_us_voters_votes           : 379.0
+
+--- Registro 2 ---
+  imdb_title_id                 : tt5454534
+  title                         : School Bus
+  original_title                : School Bus
+  year                          : 2016
+  date_published                : 2016-05-27
+  genre                         : Drama, Family
+  duration                      : 118
+  country                       : India
+  language                      : Malayalam
+  director                      : Roshan Andrews
+  writer                        : Roshan Andrews, Bobby
+  production_company            : AVA Productions
+  actors                        : Aakash Muraleedharan, Angelina Roshan, Kunchacko Boban, Jayasurya, Aparna Gopinath, A.V. Anoop, Chandradasan, Baiju Ezhupunna, Murali Gopy
+  description                   : Joseph and Aparna are a couple with two children. Their son Aakash is a troublemaker and often rebuked for it. The intervention of certain characters makes their life highly complicated and the children too get affected.
+  avg_vote                      : 5.7
+  votes                         : 214
+  budget                        : null
+  usa_gross_income              : null
+  worlwide_gross_income         : null
+  metascore                     : null
+  reviews_from_users            : 1.0
+  reviews_from_critics          : 1.0
+  weighted_average_vote         : 5.7
+  total_votes                   : 214
+  mean_vote                     : 5.9
+  median_vote                   : 6.0
+  votes_10                      : 6
+  votes_9                       : 8
+  votes_8                       : 11
+  votes_7                       : 44
+  votes_6                       : 64
+  votes_5                       : 49
+  votes_4                       : 18
+  votes_3                       : 7
+  votes_2                       : 3
+  votes_1                       : 4
+  allgenders_0age_avg_vote      : null
+  allgenders_0age_votes         : null
+  allgenders_18age_avg_vote     : 5.6
+  allgenders_18age_votes        : 59.0
+  allgenders_30age_avg_vote     : 5.6
+  allgenders_30age_votes        : 72.0
+  allgenders_45age_avg_vote     : 6.2
+  allgenders_45age_votes        : 4.0
+  males_allages_avg_vote        : 5.6
+  males_allages_votes           : 150.0
+  males_0age_avg_vote           : null
+  males_0age_votes              : null
+  males_18age_avg_vote          : 5.6
+  males_18age_votes             : 59.0
+  males_30age_avg_vote          : 5.5
+  males_30age_votes             : 67.0
+  males_45age_avg_vote          : 6.2
+  males_45age_votes             : 4.0
+  females_allages_avg_vote      : 6.3
+  females_allages_votes         : 6.0
+  females_0age_avg_vote         : null
+  females_0age_votes            : null
+  females_18age_avg_vote        : null
+  females_18age_votes           : null
+  females_30age_avg_vote        : 6.3
+  females_30age_votes           : 5.0
+  females_45age_avg_vote        : null
+  females_45age_votes           : null
+  top1000_voters_rating         : null
+  top1000_voters_votes          : null
+  us_voters_rating              : 5.6
+  us_voters_votes               : 10.0
+  non_us_voters_rating          : 5.6
+  non_us_voters_votes           : 94.0
+
+--- Registro 3 ---
+  imdb_title_id                 : tt0047789
+  title                         : 08/15 Kaputt
+  original_title                : 08/15 - In der Heimat
+  year                          : 1955
+  date_published                : 1955-12-30
+  genre                         : Drama, War
+  duration                      : 96
+  country                       : West Germany
+  language                      : German
+  director                      : Paul May
+  writer                        : Hans Hellmut Kirst, Ernst von Salomon
+  production_company            : Divina-Film
+  actors                        : O.E. Hasse, Hannes Schiel, Gustav Knuth, Emmerich Schrenk, Michael Janisch, Joachim Fuchsberger, Stig Roland, Max Mairich, Hans Christian Blech, Peter Carsten, Helen Vita, Renate Ewert, Edith Schultze-Westrum, Gustav Waldau, Hertha von Hagen
+  description                   : In the spring of 1945, the German troops are practically defeated, and the battalion of Kowalski, major general von Plönnies and Asch is left to its own devices to a large extent.
+  avg_vote                      : 6.1
+  votes                         : 240
+  budget                        : null
+  usa_gross_income              : null
+  worlwide_gross_income         : null
+  metascore                     : null
+  reviews_from_users            : 3.0
+  reviews_from_critics          : null
+  weighted_average_vote         : 6.1
+  total_votes                   : 240
+  mean_vote                     : 6.3
+  median_vote                   : 6.0
+  votes_10                      : 18
+  votes_9                       : 23
+  votes_8                       : 24
+  votes_7                       : 41
+  votes_6                       : 59
+  votes_5                       : 42
+  votes_4                       : 10
+  votes_3                       : 5
+  votes_2                       : 7
+  votes_1                       : 11
+  allgenders_0age_avg_vote      : null
+  allgenders_0age_votes         : null
+  allgenders_18age_avg_vote     : 7.0
+  allgenders_18age_votes        : 5.0
+  allgenders_30age_avg_vote     : 5.6
+  allgenders_30age_votes        : 53.0
+  allgenders_45age_avg_vote     : 6.2
+  allgenders_45age_votes        : 119.0
+  males_allages_avg_vote        : 6.0
+  males_allages_votes           : 172.0
+  males_0age_avg_vote           : null
+  males_0age_votes              : null
+  males_18age_avg_vote          : 7.0
+  males_18age_votes             : 4.0
+  males_30age_avg_vote          : 5.6
+  males_30age_votes             : 51.0
+  males_45age_avg_vote          : 6.1
+  males_45age_votes             : 112.0
+  females_allages_avg_vote      : 7.6
+  females_allages_votes         : 8.0
+  females_0age_avg_vote         : null
+  females_0age_votes            : null
+  females_18age_avg_vote        : 6.0
+  females_18age_votes           : 1.0
+  females_30age_avg_vote        : 7.0
+  females_30age_votes           : 2.0
+  females_45age_avg_vote        : 8.1
+  females_45age_votes           : 5.0
+  top1000_voters_rating         : 5.3
+  top1000_voters_votes          : 25.0
+  us_voters_rating              : 3.8
+  us_voters_votes               : 15.0
+  non_us_voters_rating          : 6.3
+  non_us_voters_votes           : 158.0
+
+--- Registro 4 ---
+  imdb_title_id                 : tt0047790
+  title                         : Operazione walkiria
+  original_title                : Der 20. Juli
+  year                          : 1955
+  date_published                : 1955-06-21
+  genre                         : Drama, History, Thriller
+  duration                      : 97
+  country                       : West Germany
+  language                      : German, French
+  director                      : Falk Harnack
+  writer                        : Falk Harnack, Werner Jörg Lüddecke
+  production_company            : Central Cinema Company Film (CCC)
+  actors                        : Wolfgang Preiss, Annemarie Düringer, Robert Freitag, Fritz Tillmann, Werner Hinz, Peter Esser, Wolfgang Büttner, Hans Zesch-Ballot, Karl Klüsner, Herbert Wilk, Ernst Lothar, Heinz Giese, Paul Bildt, Maximilian Schell, Erich Schellow
+  description                   : A disillusioned Wehrmacht officer named Colonel Claus von Stauffenberg and his co-conspirators attempt to assassinate Adolf Hitler on 20 July 1944.
+  avg_vote                      : 6.6
+  votes                         : 130
+  budget                        : null
+  usa_gross_income              : null
+  worlwide_gross_income         : null
+  metascore                     : null
+  reviews_from_users            : 2.0
+  reviews_from_critics          : 1.0
+  weighted_average_vote         : 6.6
+  total_votes                   : 130
+  mean_vote                     : 7.2
+  median_vote                   : 7.0
+  votes_10                      : 26
+  votes_9                       : 7
+  votes_8                       : 29
+  votes_7                       : 35
+  votes_6                       : 12
+  votes_5                       : 7
+  votes_4                       : 3
+  votes_3                       : 2
+  votes_2                       : 3
+  votes_1                       : 6
+  allgenders_0age_avg_vote      : null
+  allgenders_0age_votes         : null
+  allgenders_18age_avg_vote     : 6.0
+  allgenders_18age_votes        : 2.0
+  allgenders_30age_avg_vote     : 7.0
+  allgenders_30age_votes        : 34.0
+  allgenders_45age_avg_vote     : 6.3
+  allgenders_45age_votes        : 68.0
+  males_allages_avg_vote        : 6.5
+  males_allages_votes           : 94.0
+  males_0age_avg_vote           : null
+  males_0age_votes              : null
+  males_18age_avg_vote          : 6.0
+  males_18age_votes             : 2.0
+  males_30age_avg_vote          : 6.9
+  males_30age_votes             : 30.0
+  males_45age_avg_vote          : 6.2
+  males_45age_votes             : 61.0
+  females_allages_avg_vote      : 7.2
+  females_allages_votes         : 10.0
+  females_0age_avg_vote         : null
+  females_0age_votes            : null
+  females_18age_avg_vote        : null
+  females_18age_votes           : null
+  females_30age_avg_vote        : 9.0
+  females_30age_votes           : 3.0
+  females_45age_avg_vote        : 7.2
+  females_45age_votes           : 7.0
+  top1000_voters_rating         : 4.8
+  top1000_voters_votes          : 21.0
+  us_voters_rating              : 7.7
+  us_voters_votes               : 9.0
+  non_us_voters_rating          : 6.4
+  non_us_voters_votes           : 94.0
+
+--- Registro 5 ---
+  imdb_title_id                 : tt0120257
+  title                         : Lo straniero che venne dal mare
+  original_title                : Swept from the Sea
+  year                          : 1997
+  date_published                : 1998-05-15
+  genre                         : Drama, Mystery, Romance
+  duration                      : 115
+  country                       : UK, USA
+  language                      : English
+  director                      : Beeban Kidron
+  writer                        : Joseph Conrad, Tim Willocks
+  production_company            : TriStar Pictures
+  actors                        : Rachel Weisz, Vincent Perez, Ian McKellen, Kathy Bates, Joss Ackland, Tony Haygarth, Fiona Victory, Tom Bell, Zoë Wanamaker, William Scott-Masson, Eve Matheson, Dave Hill, Roger Ashton-Griffiths, Matthew Scurfield, Margery Withers
+  description                   : The of story of Russian emigrant Yanko Goorall and servant Amy Foster in the end of nineteenth century. When Yanko enters a farm, sick and hungry after a shipwreck, everyone is afraid of him, except for Amy.
+  avg_vote                      : 6.8
+  votes                         : 3051
+  budget                        : null
+  usa_gross_income              : $ 397020
+  worlwide_gross_income         : $ 397020
+  metascore                     : null
+  reviews_from_users            : 39.0
+  reviews_from_critics          : 22.0
+  weighted_average_vote         : 6.8
+  total_votes                   : 3051
+  mean_vote                     : 7.1
+  median_vote                   : 7.0
+  votes_10                      : 377
+  votes_9                       : 267
+  votes_8                       : 588
+  votes_7                       : 826
+  votes_6                       : 520
+  votes_5                       : 252
+  votes_4                       : 115
+  votes_3                       : 50
+  votes_2                       : 25
+  votes_1                       : 31
+  allgenders_0age_avg_vote      : null
+  allgenders_0age_votes         : null
+  allgenders_18age_avg_vote     : 7.0
+  allgenders_18age_votes        : 177.0
+  allgenders_30age_avg_vote     : 6.8
+  allgenders_30age_votes        : 1193.0
+  allgenders_45age_avg_vote     : 6.8
+  allgenders_45age_votes        : 958.0
+  males_allages_avg_vote        : 6.6
+  males_allages_votes           : 1278.0
+  males_0age_avg_vote           : null
+  males_0age_votes              : null
+  males_18age_avg_vote          : 6.8
+  males_18age_votes             : 48.0
+  males_30age_avg_vote          : 6.5
+  males_30age_votes             : 581.0
+  males_45age_avg_vote          : 6.6
+  males_45age_votes             : 613.0
+  females_allages_avg_vote      : 7.1
+  females_allages_votes         : 1088.0
+  females_0age_avg_vote         : null
+  females_0age_votes            : null
+  females_18age_avg_vote        : 7.0
+  females_18age_votes           : 127.0
+  females_30age_avg_vote        : 7.1
+  females_30age_votes           : 594.0
+  females_45age_avg_vote        : 7.1
+  females_45age_votes           : 328.0
+  top1000_voters_rating         : 6.0
+  top1000_voters_votes          : 107.0
+  us_voters_rating              : 7.0
+  us_voters_votes               : 739.0
+  non_us_voters_rating          : 6.7
+  non_us_voters_votes           : 1423.0
+
+--- Estadísticas combinadas ---
+
+[Consola - Truncado a 40 caracteres]
++-------+------------------+------------------+-----------------+-----------------+---------------------+-----------------+
+|summary|              year|          duration|         avg_vote|            votes|weighted_average_vote|      total_votes|
++-------+------------------+------------------+-----------------+-----------------+---------------------+-----------------+
+|  count|             85855|             85855|            85855|            85855|                85855|            85855|
+|   mean|1993.5005940317283|100.35141808863781|5.898655873274695|9493.489604565837|    5.898655873274695|9493.489604565837|
+| stddev|24.216404516823825|22.553847985369135|1.234987351297737|53574.35954323704|    1.234987351297737|53574.35954323704|
+|    min|              1894|                41|              1.0|               99|                  1.0|               99|
+|    max|     TV Movie 2019|               808|              9.9|          2278845|                  9.9|          2278845|
++-------+------------------+------------------+-----------------+-----------------+---------------------+-----------------+
+
+✓ Tabla completa guardada en: analisis_reportes/joined_stats.txt
+
+================================================================================
+4. ANÁLISIS ADICIONAL
+================================================================================
+
+--- Registros únicos por columna clave ---
+Películas únicas (imdb_title_id): 85855
+Años únicos: 113
+Países únicos: 4908
+Idiomas únicos: 4378
+
+--- Top 10 años con más películas ---
+
+[Consola - Truncado a 40 caracteres]
++----+-----+
+|year|count|
++----+-----+
+|2017| 3329|
+|2018| 3257|
+|2016| 3138|
+|2015| 2977|
+|2014| 2942|
+|2019| 2841|
+|2013| 2783|
+|2012| 2560|
+|2011| 2429|
+|2009| 2298|
++----+-----+
+only showing top 10 rows
+
+✓ Tabla completa guardada en: analisis_reportes/top_years.txt
+
+--- Distribución de calidad de datos ---
+Registros sin ningún valor nulo: 4866 (5.667695533166385%.2f%%)
+Registros con al menos un valor nulo: 80989 (94.33230446683362%.2f%%)
